@@ -3,30 +3,41 @@ import os
 
 def print_menu_title():
     os.system("cls")
-    menu_title_string = "{} My Movies Database {}".format("*"*20, "*"*20)
+    menu_title_string = "{} My Movies Database {}\n".format("*"*15, "*"*15)
     print(menu_title_string)
 
 
 def print_movies_list(movies):
     print_menu_title()
     total_movies = len(movies)
-    print_movies_string = f"\n{total_movies} movies in total\n"
-
-    for movie, rating in movies.items():
-        print_movies_string += f'"{movie}": {rating}\n'
-
+    print_movies_string = f"{total_movies} movies in total\n"
+    print_movies_string += "\n".join([f'"{movie}": {rating}' for movie, rating in movies.items()])
+    print_movies_string += "\n"
     print(print_movies_string)
 
     input("Press enter to continue")
 
 
+def add_movie_screen(movies: dict):
+    print_menu_title()
+
+    movie_name = input("Enter a new movie name: ")
+    movie_rating = input("Enter new movie rating: ")
+
+    grades = "".join([str(num) for num in list(range(0, 11))])
+
+    print_menu_title()
+    if movie_rating in grades:
+        movies[movie_name] = movie_rating
+        print(f"Movie {movie_name} successfully added")
+    else:
+        print(f"Rating {movie_rating} is invalid")
+
+    input("\nPress enter to continue")
 
 
-def add_movie(movies_dict: dict):
-    pass
 
-
-def delete_movie():
+def delete_movie_screen(movies: dict):
     pass
 
 
@@ -52,8 +63,7 @@ def print_sorted_movies_by_rating(movies: dict):
 
 def print_menu():
     print_menu_title()
-    menu_string = """ 
-Menu:
+    menu_string = """Menu:
 1. List movies
 2. Add movie
 3. Delete movie
@@ -70,9 +80,9 @@ def execute_user_input(user_input, movies):
     if user_input == "1":
         print_movies_list(movies)
     elif user_input == "2":
-        pass
+        add_movie_screen(movies)
     elif user_input == "3":
-        pass
+        delete_movie_screen(movies)
     elif user_input == "4":
         pass
     elif user_input == "5":
