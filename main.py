@@ -1,13 +1,15 @@
 import os
-
+import statistics
 
 def print_clear_screen_and_menu_title():
     os.system("cls")
     menu_title_string = "{} My Movies Database {}\n".format("*"*15, "*"*15)
     print(menu_title_string)
 
-def add_movie_to_dict(movies: dict, key: str, value: float):
-    movies[key] = round(value, 1)
+
+def add_movie_to_dict(movies: dict, movie_name: str, movie_rating: str):
+    movie_rating_float = float(movie_rating)
+    movies[movie_name] = round(movie_rating_float, 1)
 
 
 def is_movie_rating_valid(rank: str) -> bool:
@@ -19,9 +21,6 @@ def is_movie_rating_valid(rank: str) -> bool:
             return False
     except ValueError:
         return False
-
-
-print(is_movie_rating_valid("d.4"))
 
 
 def print_movies_list(movies):
@@ -42,7 +41,7 @@ def add_movie_screen(movies: dict):
 
     print_clear_screen_and_menu_title()
     if is_movie_rating_valid(input_movie_rating):
-        add_movie_to_dict(input_movie_name, input_movie_name, input_movie_rating)
+        add_movie_to_dict(movies, input_movie_name, input_movie_rating)
         print(f"Movie {input_movie_name} successfully added")
     else:
         print(f"Rating {input_movie_rating} is invalid")
@@ -57,9 +56,9 @@ def delete_movie_screen(movies: dict):
     message_to_print = ""
     if input_movie_to_delete in movies:
         del movies[input_movie_to_delete]
-        message_to_print = "Movie ff successfully deleted"
+        message_to_print = f"Movie {input_movie_to_delete} successfully deleted"
     else:
-        message_to_print = "Movie dd doesn't exist!"
+        message_to_print = f"Movie {input_movie_to_delete} doesn't exist!"
 
     print_clear_screen_and_menu_title()
     print(message_to_print)
@@ -87,9 +86,23 @@ def update_movie_screen(movies: dict):
 
 
 
-def print_stats(movies: dict):
-    pass
+def print_stats_screen(movies: dict):
+    average_rating = round(sum(movies.values()) / len(movies), 1)
+    median_rating = round(statistics.median(movies.values()), 1)
+    best_movie_name = max(movies, key=movies.get)
+    worst_movie_name = min(movies, key=movies.get)
 
+    stats_string ="""Average rating: {}
+Median rating: {}
+Best movie: {}, {}
+Worst movie: {}, {}""".format(average_rating,
+           median_rating,
+           best_movie_name, movies[best_movie_name],
+           worst_movie_name, movies[worst_movie_name])
+
+    print_clear_screen_and_menu_title()
+    print(stats_string)
+    input("\nEnter enter to continue")
 
 def print_random_movie(movies: dict):
     pass
@@ -128,7 +141,7 @@ def execute_user_input(user_input, movies):
     elif user_input == "4":
         update_movie_screen(movies)
     elif user_input == "5":
-        pass
+        print_stats_screen(movies)
     elif user_input == "6":
         pass
     elif user_input == "7":
