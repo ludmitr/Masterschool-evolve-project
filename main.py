@@ -1,4 +1,5 @@
 import os
+import random
 import statistics
 
 def print_clear_screen_and_menu_title():
@@ -102,11 +103,13 @@ Worst movie: {}, {}""".format(average_rating,
 
     print_clear_screen_and_menu_title()
     print(stats_string)
-    input("\nEnter enter to continue")
+    input("\nPress enter to continue")
 
 def print_random_movie(movies: dict):
-    pass
-
+    random_movie_name = random.choice(list(movies.keys()))
+    print_clear_screen_and_menu_title()
+    print(f"Your movie for tonight: {random_movie_name}, it's rated {movies[random_movie_name]}")
+    input("\nPress enter to continue")
 
 def search(movies: dict):
     pass
@@ -143,7 +146,7 @@ def execute_user_input(user_input, movies):
     elif user_input == "5":
         print_stats_screen(movies)
     elif user_input == "6":
-        pass
+        print_random_movie(movies)
     elif user_input == "7":
         pass
     elif user_input == "8":
