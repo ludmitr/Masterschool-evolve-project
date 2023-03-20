@@ -36,9 +36,20 @@ def add_movie_screen(movies: dict):
     input("\nPress enter to continue")
 
 
-
 def delete_movie_screen(movies: dict):
-    pass
+    print_menu_title()
+    input_movie_to_delete = input("Enter movie name to delete: ")
+    print_menu_title()
+    message_to_print = ""
+    if input_movie_to_delete in movies:
+        del movies[input_movie_to_delete]
+        message_to_print = "Movie ff successfully deleted"
+    else:
+        message_to_print = "Movie dd doesn't exist!"
+
+    print_menu_title()
+    print(message_to_print)
+    input("\nPress enter to continue")
 
 
 def update_movie():
