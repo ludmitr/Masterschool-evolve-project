@@ -14,6 +14,13 @@ def print_clear_screen_and_menu_title():
     print(menu_title_string)
 
 
+def search_movie_by_part_name(movies: dict, part_of_name: str) -> dict:
+    part_of_name = part_of_name.lower()
+    # if part_of_name in key of movies, adding it element to found_movies_dict
+    found_movies_dict = {key: value for key, value in movies.items() if part_of_name in key.lower()}
+    return found_movies_dict
+
+
 def add_movie_to_dict(movies: dict, movie_name: str, movie_rating: str):
     movie_rating_float = float(movie_rating)
     movies[movie_name] = round(movie_rating_float, 1)
@@ -111,18 +118,50 @@ Worst movie: {}, {}""".format(average_rating,
     print(stats_string)
     input("\nPress enter to continue")
 
+
 def print_random_movie(movies: dict):
     random_movie_name = random.choice(list(movies.keys()))
     print_clear_screen_and_menu_title()
     print(f"Your movie for tonight: {random_movie_name}, it's rated {movies[random_movie_name]}")
     input("\nPress enter to continue")
 
-def search(movies: dict):
-    pass
+
+def search_movie_by_name_screen(movies: dict):
+    print_clear_screen_and_menu_title()
+
+    input_movie_name = input("Enter part of movie name: ")
+    found_movies = search_movie_by_part_name(movies, input_movie_name)
+    print_result = ""
+    if len(found_movies) > 0:
+        for movie, rating in found_movies.items():
+            print_result += f"{movie}, {rating}\n"
+        # removing last \n
+        print_result = print_result[:-1]
+    else:
+        print_result = f"We are sorry, there is no films that matches your '{input_movie_name}' search"
+
+    print_clear_screen_and_menu_title()
+    print(print_result)
+    input("\nPress enter to continue")
 
 
-def print_sorted_movies_by_rating(movies: dict):
-    pass
+def sort_movies_by_rating(movies) -> dict:
+    sorted_dict = dict(sorted(movies.items(), key=lambda item: item[1], reverse=True))
+    return sorted_dict
+
+
+def print_sorted_movies_by_rating_screen(movies: dict):
+    ordered_movies_by_rating = sort_movies_by_rating(movies)
+    print_result = ""
+    for movie, rating in ordered_movies_by_rating.items():
+        print_result += f"{movie}: {rating}\n"
+    print_result = print_result[:-1]
+
+    print_clear_screen_and_menu_title()
+    print(print_result)
+    input("\nPress enter to continue")
+
+
 
 
 def print_menu():
@@ -136,8 +175,24 @@ def print_menu():
 6. Random movie
 7. Search movie
 8. Movies sorted by rating
+9. Create Rating Histogram
 """
     print(menu_string)
+
+
+def create_and_save_histogram(movies, input_file_name):
+    pass
+
+
+def create_histogram_in_file_screen(movies):
+    print_clear_screen_and_menu_title()
+
+    input_file_name = input("Name the file to save histogram: ")
+    create_and_save_histogram(movies, input_file_name)
+
+    print_clear_screen_and_menu_title()
+    print(f"Histogram saved in {input_file_name}")
+    input("\nPress enter to continue")
 
 
 def execute_user_input(user_input, movies):
@@ -154,9 +209,11 @@ def execute_user_input(user_input, movies):
     elif user_input == "6":
         print_random_movie(movies)
     elif user_input == "7":
-        pass
+        search_movie_by_name_screen(movies)
     elif user_input == "8":
-        pass
+        print_sorted_movies_by_rating_screen(movies)
+    elif user_input == "9":
+        create_histogram_in_file_screen(movies)
 
 
 
