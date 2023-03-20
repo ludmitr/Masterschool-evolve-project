@@ -1,9 +1,15 @@
 import os
 import random
 import statistics
+import sys
+my_os = sys.platform
+
 
 def print_clear_screen_and_menu_title():
-    os.system("cls")
+    clear_command = "cls"
+    if my_os in ["darwin", "linux"]:
+        clear_command = "clear"
+    os.system(clear_command)
     menu_title_string = "{} My Movies Database {}\n".format("*"*15, "*"*15)
     print(menu_title_string)
 
