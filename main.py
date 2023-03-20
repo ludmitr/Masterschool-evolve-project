@@ -1,14 +1,31 @@
 import os
 
 
-def print_menu_title():
+def print_clear_screen_and_menu_title():
     os.system("cls")
     menu_title_string = "{} My Movies Database {}\n".format("*"*15, "*"*15)
     print(menu_title_string)
 
+def add_movie_to_dict(movies: dict, key: str, value: float):
+    movies[key] = round(value, 1)
+
+
+def is_movie_rating_valid(rank: str) -> bool:
+    try:
+        rank_float = float(rank)
+        if 0 <= rank_float <= 10:
+            return True
+        else:
+            return False
+    except ValueError:
+        return False
+
+
+print(is_movie_rating_valid("d.4"))
+
 
 def print_movies_list(movies):
-    print_menu_title()
+    print_clear_screen_and_menu_title()
     total_movies = len(movies)
     print_movies_string = f"{total_movies} movies in total\n"
     print_movies_string += "\n".join([f'"{movie}": {rating}' for movie, rating in movies.items()])
@@ -19,27 +36,24 @@ def print_movies_list(movies):
 
 
 def add_movie_screen(movies: dict):
-    print_menu_title()
+    print_clear_screen_and_menu_title()
+    input_movie_name = input("Enter a new movie name: ")
+    input_movie_rating = input("Enter new movie rating: ")
 
-    movie_name = input("Enter a new movie name: ")
-    movie_rating = input("Enter new movie rating: ")
-
-    grades = "".join([str(num) for num in list(range(0, 11))])
-
-    print_menu_title()
-    if movie_rating in grades:
-        movies[movie_name] = movie_rating
-        print(f"Movie {movie_name} successfully added")
+    print_clear_screen_and_menu_title()
+    if is_movie_rating_valid(input_movie_rating):
+        add_movie_to_dict(input_movie_name, input_movie_name, input_movie_rating)
+        print(f"Movie {input_movie_name} successfully added")
     else:
-        print(f"Rating {movie_rating} is invalid")
+        print(f"Rating {input_movie_rating} is invalid")
 
     input("\nPress enter to continue")
 
 
 def delete_movie_screen(movies: dict):
-    print_menu_title()
+    print_clear_screen_and_menu_title()
     input_movie_to_delete = input("Enter movie name to delete: ")
-    print_menu_title()
+    print_clear_screen_and_menu_title()
     message_to_print = ""
     if input_movie_to_delete in movies:
         del movies[input_movie_to_delete]
@@ -47,13 +61,30 @@ def delete_movie_screen(movies: dict):
     else:
         message_to_print = "Movie dd doesn't exist!"
 
-    print_menu_title()
+    print_clear_screen_and_menu_title()
     print(message_to_print)
     input("\nPress enter to continue")
 
 
-def update_movie():
-    pass
+def update_movie_screen(movies: dict):
+    print_clear_screen_and_menu_title()
+    input_movie_name = input("Enter movie name: ")
+
+    if input_movie_name in movies:
+        input_movie_rating = float(input("Enter new movie rating (0-10): "))
+        if is_movie_rating_valid(input_movie_rating):
+            add_movie_to_dict(movies, input_movie_name, input_movie_rating)
+            print_clear_screen_and_menu_title()
+            print(f"Movie {input_movie_name} successfully updated")
+        else:
+            print_clear_screen_and_menu_title()
+            print(f"Rating {input_movie_rating} is invalid")
+    else:
+        print_clear_screen_and_menu_title()
+        print(f"Movie {input_movie_name} doesn't exist!")
+
+    input("\nPress enter to continue")
+
 
 
 def print_stats(movies: dict):
@@ -73,7 +104,7 @@ def print_sorted_movies_by_rating(movies: dict):
 
 
 def print_menu():
-    print_menu_title()
+    print_clear_screen_and_menu_title()
     menu_string = """Menu:
 1. List movies
 2. Add movie
@@ -95,7 +126,7 @@ def execute_user_input(user_input, movies):
     elif user_input == "3":
         delete_movie_screen(movies)
     elif user_input == "4":
-        pass
+        update_movie_screen(movies)
     elif user_input == "5":
         pass
     elif user_input == "6":
