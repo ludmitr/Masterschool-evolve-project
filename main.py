@@ -224,7 +224,7 @@ def create_histogram_in_file_screen(movies):
 
     print_clear_screen_and_menu_title()
     print(f"Histogram saved in file named {input_file_name}")
-    user_input_press_enter_to_continue
+    user_input_press_enter_to_continue()
 
 
 def execute_user_input(user_input, movies):
