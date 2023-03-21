@@ -2,6 +2,8 @@ import os
 import random
 import statistics
 import sys
+import numpy as np
+from matplotlib import pyplot as plt
 my_os = sys.platform
 
 
@@ -99,7 +101,6 @@ def update_movie_screen(movies: dict):
     input("\nPress enter to continue")
 
 
-
 def print_stats_screen(movies: dict):
     average_rating = round(sum(movies.values()) / len(movies), 1)
     median_rating = round(statistics.median(movies.values()), 1)
@@ -181,8 +182,11 @@ def print_menu():
 
 
 def create_and_save_histogram(movies, input_file_name):
-    pass
+    movies_np = np.array(list(movies.values()))
+    fig, ax = plt.subplots(figsize=(10, 7))
+    ax.hist(movies_np, bins=[0, 1, 2, 3, 4, 5, 6.5, 7.5, 8, 8.5, 9, 10])
 
+    plt.savefig(input_file_name + ".png")
 
 def create_histogram_in_file_screen(movies):
     print_clear_screen_and_menu_title()
@@ -191,7 +195,7 @@ def create_histogram_in_file_screen(movies):
     create_and_save_histogram(movies, input_file_name)
 
     print_clear_screen_and_menu_title()
-    print(f"Histogram saved in {input_file_name}")
+    print(f"Histogram saved in file named {input_file_name}")
     input("\nPress enter to continue")
 
 
