@@ -4,6 +4,7 @@ import statistics
 import sys
 import numpy as np
 from matplotlib import pyplot as plt
+from fuzzywuzzy import fuzz
 my_os = sys.platform
 
 
@@ -127,20 +128,31 @@ def print_random_movie(movies: dict):
     input("\nPress enter to continue")
 
 
+def search_movie_by_fuzzy_matching(movies: dict, input_movie_name: str) -> list:
+    approved_matching_score = 65
+    # creating list of movies that their matching score is 65+. iterating on a dictionary movies
+    matched_movies = [name for name in movies if fuzz.partial_ratio(input_movie_name.lower(), name.lower()) > approved_matching_score]
+    return matched_movies
+
+
 def search_movie_by_name_screen(movies: dict):
     print_clear_screen_and_menu_title()
 
     input_movie_name = input("Enter part of movie name: ")
-    found_movies = search_movie_by_part_name(movies, input_movie_name)
+    found_movies_part_name = search_movie_by_part_name(movies, input_movie_name)
     print_result = ""
-    if len(found_movies) > 0:
-        for movie, rating in found_movies.items():
+    if len(found_movies_part_name) > 0:
+        for movie, rating in found_movies_part_name.items():
             print_result += f"{movie}, {rating}\n"
-        # removing last \n
-        print_result = print_result[:-1]
+        print_result = print_result.rstrip()  # removing last \n
     else:
-        print_result = f"We are sorry, there is no films that matches your '{input_movie_name}' search"
-
+        found_movies_fuzzy_matching = search_movie_by_fuzzy_matching(movies, input_movie_name)
+        print_result = f"The movie '{input_movie_name}' does not exist."
+        if len(found_movies_fuzzy_matching) > 0:
+            print_result += " Did you mean?\n"
+            for movie in found_movies_fuzzy_matching:
+                print_result += f"-{movie}\n"
+            print_result = print_result.rstrip()    # removing \n in the end
     print_clear_screen_and_menu_title()
     print(print_result)
     input("\nPress enter to continue")
@@ -156,7 +168,7 @@ def print_sorted_movies_by_rating_screen(movies: dict):
     print_result = ""
     for movie, rating in ordered_movies_by_rating.items():
         print_result += f"{movie}: {rating}\n"
-    print_result = print_result[:-1]
+    print_result = print_result.rstrip() # remove last \n
 
     print_clear_screen_and_menu_title()
     print(print_result)
@@ -187,6 +199,7 @@ def create_and_save_histogram(movies, input_file_name):
     ax.hist(movies_np, bins=[0, 1, 2, 3, 4, 5, 6.5, 7.5, 8, 8.5, 9, 10])
 
     plt.savefig(input_file_name + ".png")
+
 
 def create_histogram_in_file_screen(movies):
     print_clear_screen_and_menu_title()
@@ -240,6 +253,6 @@ def main():
         execute_user_input(user_input, movies)
 
 
+
 if __name__ == '__main__':
     main()
-
