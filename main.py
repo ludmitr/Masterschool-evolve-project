@@ -5,7 +5,16 @@ import sys
 import numpy as np
 from matplotlib import pyplot as plt
 from fuzzywuzzy import fuzz
+from colorama import Fore
 my_os = sys.platform
+
+
+def user_input_text(text: str) -> str:
+    return input(Fore.BLUE + text + Fore.RESET)
+
+
+def error_text_red_color(text: str) -> str:
+    return Fore.RED + text + Fore.RESET
 
 
 def print_clear_screen_and_menu_title():
@@ -13,8 +22,11 @@ def print_clear_screen_and_menu_title():
     if my_os in ["darwin", "linux"]:
         clear_command = "clear"
     os.system(clear_command)
-    menu_title_string = "{} My Movies Database {}\n".format("*"*15, "*"*15)
+    menu_title_string = Fore.LIGHTBLUE_EX +"{} My Movies Database {}\n".format("|"*15, "|"*15) + Fore.RESET
     print(menu_title_string)
+
+
+
 
 
 def search_movie_by_part_name(movies: dict, part_of_name: str) -> dict:
@@ -40,6 +52,10 @@ def is_movie_rating_valid(rank: str) -> bool:
         return False
 
 
+def user_input_press_enter_to_continue():
+    input(Fore.LIGHTBLUE_EX + "\nPress enter to continue" + Fore.RESET)
+
+
 def print_movies_list(movies):
     print_clear_screen_and_menu_title()
     total_movies = len(movies)
@@ -48,58 +64,58 @@ def print_movies_list(movies):
     print_movies_string += "\n"
     print(print_movies_string)
 
-    input("Press enter to continue")
+    user_input_press_enter_to_continue()
 
 
 def add_movie_screen(movies: dict):
     print_clear_screen_and_menu_title()
-    input_movie_name = input("Enter a new movie name: ")
-    input_movie_rating = input("Enter new movie rating: ")
+    input_movie_name = user_input_text("Enter a new movie name: ")
+    input_movie_rating = user_input_text("Enter new movie rating: ")
 
     print_clear_screen_and_menu_title()
     if is_movie_rating_valid(input_movie_rating):
         add_movie_to_dict(movies, input_movie_name, input_movie_rating)
         print(f"Movie {input_movie_name} successfully added")
     else:
-        print(f"Rating {input_movie_rating} is invalid")
+        print(error_text_red_color(f"Rating {input_movie_rating} is invalid"))
 
-    input("\nPress enter to continue")
+    user_input_press_enter_to_continue()
 
 
 def delete_movie_screen(movies: dict):
     print_clear_screen_and_menu_title()
-    input_movie_to_delete = input("Enter movie name to delete: ")
+    input_movie_to_delete = user_input_text("Enter movie name to delete: ")
     print_clear_screen_and_menu_title()
     message_to_print = ""
     if input_movie_to_delete in movies:
         del movies[input_movie_to_delete]
         message_to_print = f"Movie {input_movie_to_delete} successfully deleted"
     else:
-        message_to_print = f"Movie {input_movie_to_delete} doesn't exist!"
+        message_to_print = error_text_red_color(f"Movie {input_movie_to_delete} doesn't exist!")
 
     print_clear_screen_and_menu_title()
     print(message_to_print)
-    input("\nPress enter to continue")
+    user_input_press_enter_to_continue()
 
 
 def update_movie_screen(movies: dict):
     print_clear_screen_and_menu_title()
-    input_movie_name = input("Enter movie name: ")
+    input_movie_name = user_input_text("Enter movie name: ")
 
     if input_movie_name in movies:
-        input_movie_rating = float(input("Enter new movie rating (0-10): "))
+        input_movie_rating = user_input_text("Enter new movie rating (0-10): ")
         if is_movie_rating_valid(input_movie_rating):
             add_movie_to_dict(movies, input_movie_name, input_movie_rating)
             print_clear_screen_and_menu_title()
             print(f"Movie {input_movie_name} successfully updated")
         else:
             print_clear_screen_and_menu_title()
-            print(f"Rating {input_movie_rating} is invalid")
+            print(error_text_red_color(f"Rating {input_movie_rating} is invalid"))
     else:
         print_clear_screen_and_menu_title()
-        print(f"Movie {input_movie_name} doesn't exist!")
+        print(error_text_red_color(f"Movie {input_movie_name} doesn't exist!"))
 
-    input("\nPress enter to continue")
+    user_input_press_enter_to_continue()
 
 
 def print_stats_screen(movies: dict):
@@ -118,14 +134,14 @@ Worst movie: {}, {}""".format(average_rating,
 
     print_clear_screen_and_menu_title()
     print(stats_string)
-    input("\nPress enter to continue")
+    user_input_press_enter_to_continue()
 
 
-def print_random_movie(movies: dict):
+def print_random_movie_screen(movies: dict):
     random_movie_name = random.choice(list(movies.keys()))
     print_clear_screen_and_menu_title()
     print(f"Your movie for tonight: {random_movie_name}, it's rated {movies[random_movie_name]}")
-    input("\nPress enter to continue")
+    user_input_press_enter_to_continue()
 
 
 def search_movie_by_fuzzy_matching(movies: dict, input_movie_name: str) -> list:
@@ -138,7 +154,7 @@ def search_movie_by_fuzzy_matching(movies: dict, input_movie_name: str) -> list:
 def search_movie_by_name_screen(movies: dict):
     print_clear_screen_and_menu_title()
 
-    input_movie_name = input("Enter part of movie name: ")
+    input_movie_name = user_input_text("Enter part of movie name: ")
     found_movies_part_name = search_movie_by_part_name(movies, input_movie_name)
     print_result = ""
     if len(found_movies_part_name) > 0:
@@ -147,7 +163,7 @@ def search_movie_by_name_screen(movies: dict):
         print_result = print_result.rstrip()  # removing last \n
     else:
         found_movies_fuzzy_matching = search_movie_by_fuzzy_matching(movies, input_movie_name)
-        print_result = f"The movie '{input_movie_name}' does not exist."
+        print_result = error_text_red_color(f"The movie '{input_movie_name}' does not exist.")
         if len(found_movies_fuzzy_matching) > 0:
             print_result += " Did you mean?\n"
             for movie in found_movies_fuzzy_matching:
@@ -155,7 +171,7 @@ def search_movie_by_name_screen(movies: dict):
             print_result = print_result.rstrip()    # removing \n in the end
     print_clear_screen_and_menu_title()
     print(print_result)
-    input("\nPress enter to continue")
+    user_input_press_enter_to_continue()
 
 
 def sort_movies_by_rating(movies) -> dict:
@@ -168,18 +184,17 @@ def print_sorted_movies_by_rating_screen(movies: dict):
     print_result = ""
     for movie, rating in ordered_movies_by_rating.items():
         print_result += f"{movie}: {rating}\n"
-    print_result = print_result.rstrip() # remove last \n
+    print_result = print_result.rstrip()  # remove last \n
 
     print_clear_screen_and_menu_title()
     print(print_result)
-    input("\nPress enter to continue")
-
-
+    user_input_press_enter_to_continue()
 
 
 def print_menu():
     print_clear_screen_and_menu_title()
-    menu_string = """Menu:
+    Menu = Fore.RED + "\033[4m" + "Menu:" + "\033[0m" + Fore.RESET
+    menu_string = f"""{Menu}
 1. List movies
 2. Add movie
 3. Delete movie
@@ -204,12 +219,12 @@ def create_and_save_histogram(movies, input_file_name):
 def create_histogram_in_file_screen(movies):
     print_clear_screen_and_menu_title()
 
-    input_file_name = input("Name the file to save histogram: ")
+    input_file_name = user_input_text("Name the file to save histogram: ")
     create_and_save_histogram(movies, input_file_name)
 
     print_clear_screen_and_menu_title()
     print(f"Histogram saved in file named {input_file_name}")
-    input("\nPress enter to continue")
+    user_input_press_enter_to_continue
 
 
 def execute_user_input(user_input, movies):
@@ -224,14 +239,13 @@ def execute_user_input(user_input, movies):
     elif user_input == "5":
         print_stats_screen(movies)
     elif user_input == "6":
-        print_random_movie(movies)
+        print_random_movie_screen(movies)
     elif user_input == "7":
         search_movie_by_name_screen(movies)
     elif user_input == "8":
         print_sorted_movies_by_rating_screen(movies)
     elif user_input == "9":
         create_histogram_in_file_screen(movies)
-
 
 
 def main():
@@ -249,9 +263,8 @@ def main():
     }
     while True:
         print_menu()
-        user_input = input("Enter choice (1-8): ")
+        user_input = input(Fore.LIGHTBLUE_EX + "Enter choice (1-8): " + Fore.RESET)
         execute_user_input(user_input, movies)
-
 
 
 if __name__ == '__main__':
