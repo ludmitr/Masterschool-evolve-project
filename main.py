@@ -22,11 +22,8 @@ def print_clear_screen_and_menu_title():
     if my_os in ["darwin", "linux"]:
         clear_command = "clear"
     os.system(clear_command)
-    menu_title_string = Fore.LIGHTBLUE_EX +"{} My Movies Database {}\n".format("|"*15, "|"*15) + Fore.RESET
+    menu_title_string = Fore.LIGHTBLUE_EX + "{} My Movies Database {}\n".format("|"*15, "|"*15) + Fore.RESET
     print(menu_title_string)
-
-
-
 
 
 def search_movie_by_part_name(movies: dict, part_of_name: str) -> dict:
@@ -86,7 +83,6 @@ def delete_movie_screen(movies: dict):
     print_clear_screen_and_menu_title()
     input_movie_to_delete = user_input_text("Enter movie name to delete: ")
     print_clear_screen_and_menu_title()
-    message_to_print = ""
     if input_movie_to_delete in movies:
         del movies[input_movie_to_delete]
         message_to_print = f"Movie {input_movie_to_delete} successfully deleted"
@@ -124,13 +120,16 @@ def print_stats_screen(movies: dict):
     best_movie_name = max(movies, key=movies.get)
     worst_movie_name = min(movies, key=movies.get)
 
-    stats_string ="""Average rating: {}
+    stats_string = """Average rating: {}
 Median rating: {}
 Best movie: {}, {}
-Worst movie: {}, {}""".format(average_rating,
-           median_rating,
-           best_movie_name, movies[best_movie_name],
-           worst_movie_name, movies[worst_movie_name])
+Worst movie: {}, {}""".format(
+        average_rating,
+        median_rating,
+        best_movie_name,
+        movies[best_movie_name],
+        worst_movie_name,
+        movies[worst_movie_name])
 
     print_clear_screen_and_menu_title()
     print(stats_string)
@@ -147,7 +146,8 @@ def print_random_movie_screen(movies: dict):
 def search_movie_by_fuzzy_matching(movies: dict, input_movie_name: str) -> list:
     approved_matching_score = 65
     # creating list of movies that their matching score is 65+. iterating on a dictionary movies
-    matched_movies = [name for name in movies if fuzz.partial_ratio(input_movie_name.lower(), name.lower()) > approved_matching_score]
+    matched_movies = [name for name in movies if
+                      fuzz.partial_ratio(input_movie_name.lower(), name.lower()) > approved_matching_score]
     return matched_movies
 
 
@@ -193,8 +193,8 @@ def print_sorted_movies_by_rating_screen(movies: dict):
 
 def print_menu():
     print_clear_screen_and_menu_title()
-    Menu = Fore.RED + "\033[4m" + "Menu:" + "\033[0m" + Fore.RESET
-    menu_string = f"""{Menu}
+    menu = Fore.RED + "\033[4m" + "menu:" + "\033[0m" + Fore.RESET
+    menu_string = f"""{menu}
 1. List movies
 2. Add movie
 3. Delete movie
