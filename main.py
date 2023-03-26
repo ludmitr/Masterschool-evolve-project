@@ -228,24 +228,20 @@ def create_histogram_in_file_screen(movies):
 
 
 def execute_user_input(user_input, movies):
-    if user_input == "1":
-        print_movies_list(movies)
-    elif user_input == "2":
-        add_movie_screen(movies)
-    elif user_input == "3":
-        delete_movie_screen(movies)
-    elif user_input == "4":
-        update_movie_screen(movies)
-    elif user_input == "5":
-        print_stats_screen(movies)
-    elif user_input == "6":
-        print_random_movie_screen(movies)
-    elif user_input == "7":
-        search_movie_by_name_screen(movies)
-    elif user_input == "8":
-        print_sorted_movies_by_rating_screen(movies)
-    elif user_input == "9":
-        create_histogram_in_file_screen(movies)
+    menu_functions_dict = {
+        "1": print_movies_list,
+        "2": add_movie_screen,
+        "3": delete_movie_screen,
+        "4": update_movie_screen,
+        "5": print_stats_screen,
+        "6": print_random_movie_screen,
+        "7": search_movie_by_name_screen,
+        "8": print_sorted_movies_by_rating_screen,
+        "9": create_histogram_in_file_screen
+    }
+
+    if user_input in menu_functions_dict:
+        menu_functions_dict[user_input](movies)
 
 
 def main():
