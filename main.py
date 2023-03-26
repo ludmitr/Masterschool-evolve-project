@@ -9,6 +9,42 @@ from colorama import Fore
 my_os = sys.platform
 
 
+def main():
+    movies = {
+        "The Shawshank Redemption": 9.5,
+        "Pulp Fiction": 8.8,
+        "The Room": 3.6,
+        "The Godfather": 9.2,
+        "The Godfather: Part II": 9.0,
+        "The Dark Knight": 9.0,
+        "12 Angry Men": 8.9,
+        "Everything Everywhere All At Once": 8.9,
+        "Forrest Gump": 8.8,
+        "Star Wars: Episode V": 8.7
+    }
+    while True:
+        print_menu()
+        user_input = input(Fore.LIGHTBLUE_EX + "Enter choice (1-8): " + Fore.RESET)
+        execute_user_input(user_input, movies)
+
+
+def execute_user_input(user_input, movies):
+    menu_functions_dict = {
+        "1": print_movies_list,
+        "2": add_movie_screen,
+        "3": delete_movie_screen,
+        "4": update_movie_screen,
+        "5": print_stats_screen,
+        "6": print_random_movie_screen,
+        "7": search_movie_by_name_screen,
+        "8": print_sorted_movies_by_rating_screen,
+        "9": create_histogram_in_file_screen
+    }
+
+    if user_input in menu_functions_dict:
+        menu_functions_dict[user_input](movies)
+
+
 def user_input_text(text: str) -> str:
     return input(Fore.BLUE + text + Fore.RESET)
 
@@ -121,9 +157,9 @@ def print_stats_screen(movies: dict):
     worst_movie_name = min(movies, key=movies.get)
 
     stats_string = """Average rating: {}
-Median rating: {}
-Best movie: {}, {}
-Worst movie: {}, {}""".format(
+    Median rating: {}
+    Best movie: {}, {}
+    Worst movie: {}, {}""".format(
         average_rating,
         median_rating,
         best_movie_name,
@@ -225,42 +261,6 @@ def create_histogram_in_file_screen(movies):
     print_clear_screen_and_menu_title()
     print(f"Histogram saved in file named {input_file_name}")
     user_input_press_enter_to_continue()
-
-
-def execute_user_input(user_input, movies):
-    menu_functions_dict = {
-        "1": print_movies_list,
-        "2": add_movie_screen,
-        "3": delete_movie_screen,
-        "4": update_movie_screen,
-        "5": print_stats_screen,
-        "6": print_random_movie_screen,
-        "7": search_movie_by_name_screen,
-        "8": print_sorted_movies_by_rating_screen,
-        "9": create_histogram_in_file_screen
-    }
-
-    if user_input in menu_functions_dict:
-        menu_functions_dict[user_input](movies)
-
-
-def main():
-    movies = {
-        "The Shawshank Redemption": 9.5,
-        "Pulp Fiction": 8.8,
-        "The Room": 3.6,
-        "The Godfather": 9.2,
-        "The Godfather: Part II": 9.0,
-        "The Dark Knight": 9.0,
-        "12 Angry Men": 8.9,
-        "Everything Everywhere All At Once": 8.9,
-        "Forrest Gump": 8.8,
-        "Star Wars: Episode V": 8.7
-    }
-    while True:
-        print_menu()
-        user_input = input(Fore.LIGHTBLUE_EX + "Enter choice (1-8): " + Fore.RESET)
-        execute_user_input(user_input, movies)
 
 
 if __name__ == '__main__':
