@@ -157,9 +157,9 @@ def print_stats_screen(movies: dict):
     worst_movie_name = min(movies, key=movies.get)
 
     stats_string = """Average rating: {}
-    Median rating: {}
-    Best movie: {}, {}
-    Worst movie: {}, {}""".format(
+Median rating: {}
+Best movie: {}, {}
+Worst movie: {}, {}""".format(
         average_rating,
         median_rating,
         best_movie_name,
