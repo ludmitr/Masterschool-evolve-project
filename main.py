@@ -10,6 +10,7 @@ my_os = sys.platform
 
 
 def main():
+    # importing API movies database
     movies = {
         "The Shawshank Redemption": 9.5,
         "Pulp Fiction": 8.8,
@@ -24,12 +25,13 @@ def main():
     }
     while True:
         print_menu()
-        user_input = input(Fore.LIGHTBLUE_EX + "Enter choice (1-8): " + Fore.RESET)
+        user_input = input(Fore.LIGHTBLUE_EX + "Enter choice (0-9): " + Fore.RESET)
         execute_user_input(user_input, movies)
 
 
 def execute_user_input(user_input, movies):
     menu_functions_dict = {
+        "0": exit_program,
         "1": print_movies_list,
         "2": add_movie_screen,
         "3": delete_movie_screen,
@@ -43,6 +45,11 @@ def execute_user_input(user_input, movies):
 
     if user_input in menu_functions_dict:
         menu_functions_dict[user_input](movies)
+
+
+def exit_program(_):
+    print("BYE!")
+    sys.exit()
 
 
 def user_input_text(text: str) -> str:
@@ -231,6 +238,7 @@ def print_menu():
     print_clear_screen_and_menu_title()
     menu = Fore.RED + "\033[4m" + "menu:" + "\033[0m" + Fore.RESET
     menu_string = f"""{menu}
+0. Exit    
 1. List movies
 2. Add movie
 3. Delete movie
