@@ -278,7 +278,7 @@ def print_menu():
 
 
 def create_and_save_histogram(movies, input_file_name):
-    movies_np = np.array(list(movies.values()))
+    movies_np = np.array([movies[movie]["rating"] for movie in movies])
     fig, ax = plt.subplots(figsize=(10, 7))
     ax.hist(movies_np, bins=[0, 1, 2, 3, 4, 5, 6.5, 7.5, 8, 8.5, 9, 10])
 
