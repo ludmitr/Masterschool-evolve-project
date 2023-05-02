@@ -6,22 +6,23 @@ import numpy as np
 from matplotlib import pyplot as plt
 from fuzzywuzzy import fuzz
 from colorama import Fore
+import datetime
 my_os = sys.platform
 
 
 def main():
     # importing API movies database
     movies = {
-        "The Shawshank Redemption": 9.5,
-        "Pulp Fiction": 8.8,
-        "The Room": 3.6,
-        "The Godfather": 9.2,
-        "The Godfather: Part II": 9.0,
-        "The Dark Knight": 9.0,
-        "12 Angry Men": 8.9,
-        "Everything Everywhere All At Once": 8.9,
-        "Forrest Gump": 8.8,
-        "Star Wars: Episode V": 8.7
+        "The Shawshank Redemption": {"rating": 9.5, "year": 1994},
+        "Pulp Fiction": {"rating": 8.8, "year": 1994},
+        "The Room": {"rating": 3.6, "year": 2003},
+        "The Godfather": {"rating": 9.2, "year": 1972},
+        "The Godfather: Part II": {"rating": 9.0, "year": 1974},
+        "The Dark Knight": {"rating": 9.0, "year": 2008},
+        "12 Angry Men": {"rating": 8.9, "year": 1957},
+        "Everything Everywhere All At Once": {"rating": 8.9, "year": 2022},
+        "Forrest Gump": {"rating": 8.8, "year": 1994},
+        "Star Wars: Episode V": {"rating": 8.7, "year": 1980}
     }
     while True:
         print_menu()
@@ -76,15 +77,29 @@ def search_movie_by_part_name(movies: dict, part_of_name: str) -> dict:
     return found_movies_dict
 
 
-def add_movie_to_dict(movies: dict, movie_name: str, movie_rating: str):
-    movie_rating_float = float(movie_rating)
-    movies[movie_name] = round(movie_rating_float, 1)
+def add_movie_to_dict(movies: dict, movie_name: str, movie_rating: str, movie_year: str = "1650") -> None:
+    movie_rating_float = round(float(movie_rating), 1)
+    movie_year_int = int(movie_year)
+    movies[movie_name] = {"rating": movie_rating_float, "year": movie_year_int}
 
 
 def is_movie_rating_valid(rank: str) -> bool:
     try:
         rank_float = float(rank)
         if 0 <= rank_float <= 10:
+            return True
+        else:
+            return False
+    except ValueError:
+        return False
+
+
+def is_movie_year_valid(year: str) -> bool:
+    """Checking if the year is a valid number. Return bool.."""
+    current_year = datetime.datetime.now().year
+    try:
+        year = int(year)
+        if 1850 <= year <= current_year:
             return True
         else:
             return False
@@ -100,24 +115,31 @@ def print_movies_list(movies):
     print_clear_screen_and_menu_title()
     total_movies = len(movies)
     print_movies_string = f"{total_movies} movies in total\n"
-    print_movies_string += "\n".join([f'"{movie}": {rating}' for movie, rating in movies.items()])
+    movies_represent_list = [f'"{movie}": {movie_data["rating"]}, year: {movie_data["year"]}'
+                             for movie, movie_data in movies.items()]
+    print_movies_string += "\n".join(movies_represent_list)
     print_movies_string += "\n"
     print(print_movies_string)
 
     user_input_press_enter_to_continue()
 
 
-def add_movie_screen(movies: dict):
+def add_movie_screen(movies: dict, movie_name=None):
     print_clear_screen_and_menu_title()
-    input_movie_name = user_input_text("Enter a new movie name: ")
+    if movie_name:
+        input_movie_name = movie_name
+    else:
+        input_movie_name = user_input_text("Enter a new movie name: ")
+
     input_movie_rating = user_input_text("Enter new movie rating: ")
+    input_movie_year = user_input_text("Enter the release year: ")
 
     print_clear_screen_and_menu_title()
-    if is_movie_rating_valid(input_movie_rating):
-        add_movie_to_dict(movies, input_movie_name, input_movie_rating)
-        print(f"Movie {input_movie_name} successfully added")
+    if is_movie_rating_valid(input_movie_rating) and is_movie_year_valid(input_movie_year):
+        add_movie_to_dict(movies, input_movie_name, input_movie_rating, input_movie_year)
+        print(f"Movie {input_movie_name} successfully added/updated")
     else:
-        print(error_text_red_color(f"Rating {input_movie_rating} is invalid"))
+        print(error_text_red_color(f"Invalid data."))
 
     user_input_press_enter_to_continue()
 
@@ -157,11 +179,12 @@ def update_movie_screen(movies: dict):
     user_input_press_enter_to_continue()
 
 
+
 def print_stats_screen(movies: dict):
-    average_rating = round(sum(movies.values()) / len(movies), 1)
-    median_rating = round(statistics.median(movies.values()), 1)
-    best_movie_name = max(movies, key=movies.get)
-    worst_movie_name = min(movies, key=movies.get)
+    average_rating = round(sum(data["rating"] for data in movies.values()) / len(movies), 1)
+    median_rating = round(statistics.median(data["rating"] for data in movies.values()), 1)
+    best_movie_name = max(movies, key=lambda movie: movies[movie]["rating"])
+    worst_movie_name = min(movies, key=lambda movie: movies[movie]["rating"])
 
     stats_string = """Average rating: {}
 Median rating: {}
@@ -218,15 +241,17 @@ def search_movie_by_name_screen(movies: dict):
 
 
 def sort_movies_by_rating(movies) -> dict:
-    sorted_dict = dict(sorted(movies.items(), key=lambda item: item[1], reverse=True))
+    sorted_dict = dict(sorted(movies.items(),
+                              key=lambda movie_data: movie_data[1]['rating'],
+                              reverse=True))
     return sorted_dict
 
 
 def print_sorted_movies_by_rating_screen(movies: dict):
     ordered_movies_by_rating = sort_movies_by_rating(movies)
     print_result = ""
-    for movie, rating in ordered_movies_by_rating.items():
-        print_result += f"{movie}: {rating}\n"
+    for movie, data in ordered_movies_by_rating.items():
+        print_result += f"{movie}: {data['rating']}\n"
     print_result = print_result.rstrip()  # remove last \n
 
     print_clear_screen_and_menu_title()
