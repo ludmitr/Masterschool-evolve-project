@@ -8,6 +8,7 @@ from matplotlib import pyplot as plt
 from fuzzywuzzy import fuzz
 from colorama import Fore
 import movie_storage
+import omdbapi_api_handler
 
 MY_OS = sys.platform
 
@@ -163,18 +164,20 @@ def add_movie_screen(movie_name: str = None):
     else:
         input_movie_name = user_input_text("Enter a new movie name: ")
 
-    input_movie_rating = user_input_text("Enter new movie rating: ")
-    input_movie_year = user_input_text("Enter the release year: ")
-
+    # input_movie_rating = user_input_text("Enter new movie rating: ")
+    # input_movie_year = user_input_text("Enter the release year: ")
+    search_result = omdbapi_api_handler.search_by_title(input_movie_name)
     print_clear_screen_and_menu_title()
 
     # print message depends on if the year and rating is valid
-    if is_movie_rating_valid(input_movie_rating) and is_movie_year_valid(input_movie_year):
-        movie_rating, movie_year = round(float(input_movie_rating), 1), int(input_movie_year)
-        movie_storage.add_movie(input_movie_name, movie_year, movie_rating)
+    if search_result["Response"] == "True":
+        movie_title = search_result["Title"]
+        movie_year, image_url = int(search_result["Year"]), search_result["Poster"]
+        movie_rating = float((search_result["Ratings"][0]["Value"]).split("/")[0])
+        movie_storage.add_movie(movie_title, movie_year, movie_rating, image_url)
         print(f"Movie {input_movie_name} successfully added/updated")
     else:
-        print(error_text_red_color("Invalid data."))
+        print(error_text_red_color(f"{search_result['Error']}"))
 
     user_input_press_enter_to_continue()
 
@@ -242,12 +245,14 @@ def print_stats_screen() -> None:
     average_rating = round(sum(data["rating"] for data in movies.values()) / len(movies), 1)
     median_rating = round(statistics.median(data["rating"] for data in movies.values()), 1)
     best_movie_name = max(movies, key=lambda movie: movies[movie]["rating"])
+    best_movie_data = {"rating": movies[best_movie_name]["rating"], "year": movies[best_movie_name]["year"]}
     worst_movie_name = min(movies, key=lambda movie: movies[movie]["rating"])
+    worst_movie_data = {"rating": movies[worst_movie_name]["rating"], "year": movies[worst_movie_name]["year"]}
 
     stats_string = f"""Average rating: {average_rating}
 Median rating: {median_rating}
-Best movie: {best_movie_name}, {movies[best_movie_name]}
-Worst movie: {worst_movie_name}, {movies[worst_movie_name]}"""
+Best movie: {best_movie_name} {best_movie_data}
+Worst movie: {worst_movie_name}, {worst_movie_data}"""
 
     print_clear_screen_and_menu_title()
     print(stats_string)
@@ -259,7 +264,9 @@ def print_random_movie_screen():
     movies = movie_storage.load_data()
     random_movie_name = random.choice(list(movies.keys()))
     print_clear_screen_and_menu_title()
-    print(f"Your movie for tonight: {random_movie_name}  {movies[random_movie_name]}")
+    random_movie_data = {"rating": movies[random_movie_name]["rating"],
+                         "year": movies[random_movie_name]["year"]}
+    print(f"Your movie for tonight: {random_movie_name}  {random_movie_data}")
     user_input_press_enter_to_continue()
 
 
@@ -282,8 +289,9 @@ def search_movie_by_fuzzy_matching(movies: dict, input_movie_name: str) -> list:
 def create_str_for_found_movies(found_movies_part_name: dict) -> str:
     """create a string that represent found movies and returns it"""
     output_string = ""
-    for movie, rating in found_movies_part_name.items():
-        output_string += f"{movie}, {rating}\n"
+    for movie, data in found_movies_part_name.items():
+        movie_data = {"rating": data["rating"], "year": data["year"]}
+        output_string += f"{movie}, {movie_data}\n"
 
     return output_string.rstrip()  # removing last \n
 
