@@ -1,4 +1,5 @@
 import json
+
 FILE_PATH = "data.json"
 
 
@@ -21,7 +22,7 @@ def load_data():
       },
     }
     """
-    with open("FILE_PATH", "r") as file:
+    with open(FILE_PATH, "r") as file:
         return json.loads(file.read())
 
 
@@ -64,5 +65,5 @@ def update_movie(title, rating):
 
 def save_data(movies: dict):
     """Serialize the movies data in data.json"""
-    with open("data.json", "w") as file:
+    with open(FILE_PATH, "w") as file:
         file.write(json.dumps(movies))

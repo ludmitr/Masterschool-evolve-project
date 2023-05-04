@@ -7,6 +7,8 @@ import numpy as np
 from matplotlib import pyplot as plt
 from fuzzywuzzy import fuzz
 from colorama import Fore
+import movie_storage
+
 MY_OS = sys.platform
 
 
@@ -34,10 +36,10 @@ def main():
     while True:
         print_menu()
         user_input = input(Fore.LIGHTBLUE_EX + "Enter choice (0-9): " + Fore.RESET)
-        execute_user_input(user_input, movies)
+        execute_user_input(user_input)
 
 
-def execute_user_input(user_input: str, movies: dict) -> None:
+def execute_user_input(user_input: str) -> None:
     """
        This function executes the corresponding functionality based on the user's input.
 
@@ -59,10 +61,10 @@ def execute_user_input(user_input: str, movies: dict) -> None:
     }
 
     if user_input in menu_functions_dict:
-        menu_functions_dict[user_input](movies)
+        menu_functions_dict[user_input]()
 
 
-def exit_program(_):
+def exit_program():
     """prints a message and exits the program"""
     print("BYE!")
     sys.exit()
@@ -112,17 +114,6 @@ def search_movie_by_part_name(movies: dict, part_of_name: str) -> dict:
     return found_movies_dict
 
 
-def add_movie_to_dict(movies: dict, movie_name: str,
-                      movie_rating: str, movie_year: str = "1650") -> None:
-    """
-        Add a new movie to the movies dictionary with the provided movie name,
-        rating, and year.
-    """
-    movie_rating_float = round(float(movie_rating), 1)
-    movie_year_int = int(movie_year)
-    movies[movie_name] = {"rating": movie_rating_float, "year": movie_year_int}
-
-
 def is_movie_rating_valid(rank: str) -> bool:
     """Checks if rating of a movie is in the right range. Returns bool"""
     try:
@@ -153,25 +144,28 @@ def user_input_press_enter_to_continue() -> None:
     input(Fore.LIGHTBLUE_EX + "\nPress enter to continue" + Fore.RESET)
 
 
-def print_movies_list(movies):
+def print_movies_list():
     """
         Prints a list of movies with their ratings and release years.
         It first clears the screen, then prints the movies in a formatted string,
         and waits for the user to press Enter to continue.
     """
+    movies = movie_storage.load_data()
     print_clear_screen_and_menu_title()
     total_movies = len(movies)
+
+    # creating string for a print command
     print_movies_string = f"{total_movies} movies in total\n"
     movies_represent_list = [f'"{movie}": {movie_data["rating"]}, year: {movie_data["year"]}'
                              for movie, movie_data in movies.items()]
     print_movies_string += "\n".join(movies_represent_list)
     print_movies_string += "\n"
-    print(print_movies_string)
 
+    print(print_movies_string)
     user_input_press_enter_to_continue()
 
 
-def add_movie_screen(movies: dict, movie_name: str = None):
+def add_movie_screen(movie_name: str = None):
     """
         Add a new movie to the movies dictionary with a given name, rating, and year.
         If the input data is invalid, an error message will be displayed
@@ -190,7 +184,8 @@ def add_movie_screen(movies: dict, movie_name: str = None):
 
     # print message depends on if the year and rating is valid
     if is_movie_rating_valid(input_movie_rating) and is_movie_year_valid(input_movie_year):
-        add_movie_to_dict(movies, input_movie_name, input_movie_rating, input_movie_year)
+        movie_rating, movie_year = round(float(input_movie_rating), 1), int(input_movie_year)
+        movie_storage.add_movie(input_movie_name, movie_year, movie_rating)
         print(f"Movie {input_movie_name} successfully added/updated")
     else:
         print(error_text_red_color("Invalid data."))
@@ -198,18 +193,20 @@ def add_movie_screen(movies: dict, movie_name: str = None):
     user_input_press_enter_to_continue()
 
 
-def delete_movie_screen(movies: dict):
+def delete_movie_screen():
     """
         deletes a movie from the movies dictionary based on user input for
         the movie name.If the movie exists in the dictionary, it will be
         deleted and a success message  will be displayed. If the movie
         does not exist in the dictionary, an error message will be displayed.
     """
+    movies = movie_storage.load_data()
     print_clear_screen_and_menu_title()
     input_movie_to_delete = user_input_text("Enter movie name to delete: ")
     print_clear_screen_and_menu_title()
+
     if input_movie_to_delete in movies:
-        del movies[input_movie_to_delete]
+        movie_storage.delete_movie(input_movie_to_delete)
         message_to_print = f"Movie {input_movie_to_delete} successfully deleted"
     else:
         message_to_print = error_text_red_color(f"Movie {input_movie_to_delete} doesn't exist!")
@@ -219,27 +216,33 @@ def delete_movie_screen(movies: dict):
     user_input_press_enter_to_continue()
 
 
-def update_movie_screen(movies: dict) -> None:
+def update_movie_screen() -> None:
     """
         Updates the rating of an existing movie in the movie's dictionary.
         If the movie doesn't exist, an error message is displayed
     """
+    movies = movie_storage.load_data()
     print_clear_screen_and_menu_title()
     input_movie_name = user_input_text("Enter movie name: ")
 
+    # if movie and rating valid - update database.
+    # also create a message to print for every case
     if input_movie_name in movies:
         input_movie_rating = user_input_text("Enter new movie rating (0-10): ")
         if is_movie_rating_valid(input_movie_rating):
-            add_movie_to_dict(movies, input_movie_name, input_movie_rating)
+            movie_rating_float = round(float(input_movie_rating), 1)
+            movie_storage.update_movie(input_movie_name, movie_rating_float)
+
             print_clear_screen_and_menu_title()
-            print(f"Movie {input_movie_name} successfully updated")
+            output_string = f"Movie {input_movie_name} successfully updated"
         else:
             print_clear_screen_and_menu_title()
-            print(error_text_red_color(f"Rating {input_movie_rating} is invalid"))
+            output_string = error_text_red_color(f"Rating {input_movie_rating} is invalid")
     else:
         print_clear_screen_and_menu_title()
-        print(error_text_red_color(f"Movie {input_movie_name} doesn't exist!"))
+        output_string = error_text_red_color(f"Movie {input_movie_name} doesn't exist!")
 
+    print(output_string)
     user_input_press_enter_to_continue()
 
 
