@@ -26,14 +26,14 @@ def load_data():
         return json.loads(file.read())
 
 
-def add_movie(title, year, rating):
+def add_movie(title: str, year: int, rating: float, image_url):
     """
     Adds a movie to the movies database.
     Loads the information from the JSON file, add the movie,
     and saves it. The function doesn't need to validate the input.
     """
     movies: dict = load_data()
-    movies[title] = {"rating": rating, "year": year}
+    movies[title] = {"rating": rating, "year": year, "image": image_url}
 
     save_data(movies)
 
