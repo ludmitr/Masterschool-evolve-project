@@ -14,24 +14,10 @@ MY_OS = sys.platform
 
 def main():
     """
-       Main entry point for the program. It imports a pre-defined API movies database,
-       prints a menu of options for the user to choose from, and executes the corresponding
+       Main entry point for the program. It prints a menu of options
+        for the user to choose from, and executes the corresponding
        functionality based on the user's input.
     """
-    # importing API movies database
-    movies = {
-        "The Shawshank Redemption": {"rating": 9.5, "year": 1994},
-        "Pulp Fiction": {"rating": 8.8, "year": 1994},
-        "The Room": {"rating": 3.6, "year": 2003},
-        "The Godfather": {"rating": 9.2, "year": 1972},
-        "The Godfather: Part II": {"rating": 9.0, "year": 1974},
-        "The Dark Knight": {"rating": 9.0, "year": 2008},
-        "12 Angry Men": {"rating": 8.9, "year": 1957},
-        "Everything Everywhere All At Once": {"rating": 8.9, "year": 2022},
-        "Forrest Gump": {"rating": 8.8, "year": 1994},
-        "Star Wars: Episode V": {"rating": 8.7, "year": 1980}
-    }
-
     # continuously displays the main menu, takes user input, and execute
     while True:
         print_menu()
@@ -226,7 +212,7 @@ def update_movie_screen() -> None:
     input_movie_name = user_input_text("Enter movie name: ")
 
     # if movie and rating valid - update database.
-    # also create a message to print for every case
+    # also create a message for print for every case
     if input_movie_name in movies:
         input_movie_rating = user_input_text("Enter new movie rating (0-10): ")
         if is_movie_rating_valid(input_movie_rating):
@@ -246,29 +232,31 @@ def update_movie_screen() -> None:
     user_input_press_enter_to_continue()
 
 
-def print_stats_screen(movies: dict) -> None:
+def print_stats_screen() -> None:
     """
         Prints statistics about the movie's database,
         including the average and median ratings,
         and the best and worst rated movies.
     """
+    movies = movie_storage.load_data()
     average_rating = round(sum(data["rating"] for data in movies.values()) / len(movies), 1)
     median_rating = round(statistics.median(data["rating"] for data in movies.values()), 1)
     best_movie_name = max(movies, key=lambda movie: movies[movie]["rating"])
     worst_movie_name = min(movies, key=lambda movie: movies[movie]["rating"])
 
     stats_string = f"""Average rating: {average_rating}
-    Median rating: {median_rating}
-    Best movie: {best_movie_name}, {movies[best_movie_name]}
-    Worst movie: {worst_movie_name}, {movies[worst_movie_name]}"""
+Median rating: {median_rating}
+Best movie: {best_movie_name}, {movies[best_movie_name]}
+Worst movie: {worst_movie_name}, {movies[worst_movie_name]}"""
 
     print_clear_screen_and_menu_title()
     print(stats_string)
     user_input_press_enter_to_continue()
 
 
-def print_random_movie_screen(movies: dict):
+def print_random_movie_screen():
     """Prints a random movie from the database with its rating and year"""
+    movies = movie_storage.load_data()
     random_movie_name = random.choice(list(movies.keys()))
     print_clear_screen_and_menu_title()
     print(f"Your movie for tonight: {random_movie_name}  {movies[random_movie_name]}")
@@ -314,13 +302,14 @@ def create_str_for_fuzzy_matches(found_movies_fuzzy_matching, input_movie_name):
     return output_str
 
 
-def search_movie_by_name_screen(movies: dict):
+def search_movie_by_name_screen():
     """
         Search for a movie by a partial or fuzzy match to its name and displays
         the results to the user. If there is an exact match, it will display the
         movie's rating and year. If there are no exact matches, it will suggest
         fuzzy matches and prompt the user to choose from the suggestions.
     """
+    movies = movie_storage.load_data()
     print_clear_screen_and_menu_title()
 
     input_movie_name = user_input_text("Enter part of movie name: ")
@@ -348,8 +337,9 @@ def sort_movies_by_rating(movies) -> dict:
     return sorted_dict
 
 
-def print_sorted_movies_by_rating_screen(movies: dict) -> None:
+def print_sorted_movies_by_rating_screen() -> None:
     """Prints a sorted list of movies by rating on the screen"""
+    movies = movie_storage.load_data()
     ordered_movies_by_rating = sort_movies_by_rating(movies)
 
     print_result = ""
@@ -390,13 +380,14 @@ def create_and_save_histogram(movies: dict, input_file_name: str) -> None:
     plt.savefig(input_file_name + ".png")
 
 
-def create_histogram_in_file_screen(movies):
+def create_histogram_in_file_screen():
     """
     Displays a menu screen with instructions to enter a file name to save the histogram.
     Saves the histogram in a PNG file with the given name in the
     current directory. Displays a message with the name of the file where the histogram
     was saved, and waits for the user to press Enter to continue.
     """
+    movies = movie_storage.load_data()
     print_clear_screen_and_menu_title()
 
     input_file_name = user_input_text("Name the file to save histogram: ")
