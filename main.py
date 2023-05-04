@@ -147,6 +147,7 @@ def is_movie_year_valid(year: str) -> bool:
 
     return False
 
+
 def user_input_press_enter_to_continue() -> None:
     """user input to continue with color"""
     input(Fore.LIGHTBLUE_EX + "\nPress enter to continue" + Fore.RESET)
@@ -170,7 +171,7 @@ def print_movies_list(movies):
     user_input_press_enter_to_continue()
 
 
-def add_movie_screen(movies: dict, movie_name=None):
+def add_movie_screen(movies: dict, movie_name: str = None):
     """
         Add a new movie to the movies dictionary with a given name, rating, and year.
         If the input data is invalid, an error message will be displayed
@@ -389,8 +390,7 @@ def create_and_save_histogram(movies: dict, input_file_name: str) -> None:
 def create_histogram_in_file_screen(movies):
     """
     Displays a menu screen with instructions to enter a file name to save the histogram.
-    Calls the `create_and_save_histogram` function with the `movies` dictionary and the
-    user input file name. Saves the histogram in a PNG file with the given name in the
+    Saves the histogram in a PNG file with the given name in the
     current directory. Displays a message with the name of the file where the histogram
     was saved, and waits for the user to press Enter to continue.
     """
