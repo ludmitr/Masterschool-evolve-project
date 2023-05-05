@@ -7,37 +7,27 @@ import numpy as np
 from matplotlib import pyplot as plt
 from fuzzywuzzy import fuzz
 from colorama import Fore
+import movie_storage
+import omdbapi_api_handler
+import web_generator
+
 MY_OS = sys.platform
 
 
 def main():
     """
-       Main entry point for the program. It imports a pre-defined API movies database,
-       prints a menu of options for the user to choose from, and executes the corresponding
+       Main entry point for the program. It prints a menu of options
+        for the user to choose from, and executes the corresponding
        functionality based on the user's input.
     """
-    # importing API movies database
-    movies = {
-        "The Shawshank Redemption": {"rating": 9.5, "year": 1994},
-        "Pulp Fiction": {"rating": 8.8, "year": 1994},
-        "The Room": {"rating": 3.6, "year": 2003},
-        "The Godfather": {"rating": 9.2, "year": 1972},
-        "The Godfather: Part II": {"rating": 9.0, "year": 1974},
-        "The Dark Knight": {"rating": 9.0, "year": 2008},
-        "12 Angry Men": {"rating": 8.9, "year": 1957},
-        "Everything Everywhere All At Once": {"rating": 8.9, "year": 2022},
-        "Forrest Gump": {"rating": 8.8, "year": 1994},
-        "Star Wars: Episode V": {"rating": 8.7, "year": 1980}
-    }
-
     # continuously displays the main menu, takes user input, and execute
     while True:
         print_menu()
-        user_input = input(Fore.LIGHTBLUE_EX + "Enter choice (0-9): " + Fore.RESET)
-        execute_user_input(user_input, movies)
+        user_input = input(Fore.LIGHTBLUE_EX + "Enter choice (0-10): " + Fore.RESET)
+        execute_user_input(user_input)
 
 
-def execute_user_input(user_input: str, movies: dict) -> None:
+def execute_user_input(user_input: str) -> None:
     """
        This function executes the corresponding functionality based on the user's input.
 
@@ -55,14 +45,25 @@ def execute_user_input(user_input: str, movies: dict) -> None:
         "6": print_random_movie_screen,
         "7": search_movie_by_name_screen,
         "8": print_sorted_movies_by_rating_screen,
-        "9": create_histogram_in_file_screen
+        "9": create_histogram_in_file_screen,
+        "10": generate_website_screen
     }
 
     if user_input in menu_functions_dict:
-        menu_functions_dict[user_input](movies)
+        menu_functions_dict[user_input]()
 
 
-def exit_program(_):
+def generate_website_screen():
+    """Generate website"""
+    print_clear_screen_and_menu_title()
+
+    web_generator.generate_web()
+    print("Website was generated successfully")
+
+    user_input_press_enter_to_continue()
+
+
+def exit_program():
     """prints a message and exits the program"""
     print("BYE!")
     sys.exit()
@@ -112,17 +113,6 @@ def search_movie_by_part_name(movies: dict, part_of_name: str) -> dict:
     return found_movies_dict
 
 
-def add_movie_to_dict(movies: dict, movie_name: str,
-                      movie_rating: str, movie_year: str = "1650") -> None:
-    """
-        Add a new movie to the movies dictionary with the provided movie name,
-        rating, and year.
-    """
-    movie_rating_float = round(float(movie_rating), 1)
-    movie_year_int = int(movie_year)
-    movies[movie_name] = {"rating": movie_rating_float, "year": movie_year_int}
-
-
 def is_movie_rating_valid(rank: str) -> bool:
     """Checks if rating of a movie is in the right range. Returns bool"""
     try:
@@ -147,30 +137,34 @@ def is_movie_year_valid(year: str) -> bool:
 
     return False
 
+
 def user_input_press_enter_to_continue() -> None:
     """user input to continue with color"""
     input(Fore.LIGHTBLUE_EX + "\nPress enter to continue" + Fore.RESET)
 
 
-def print_movies_list(movies):
+def print_movies_list():
     """
         Prints a list of movies with their ratings and release years.
         It first clears the screen, then prints the movies in a formatted string,
         and waits for the user to press Enter to continue.
     """
+    movies = movie_storage.load_data()
     print_clear_screen_and_menu_title()
     total_movies = len(movies)
+
+    # creating string for a print command
     print_movies_string = f"{total_movies} movies in total\n"
     movies_represent_list = [f'"{movie}": {movie_data["rating"]}, year: {movie_data["year"]}'
                              for movie, movie_data in movies.items()]
     print_movies_string += "\n".join(movies_represent_list)
     print_movies_string += "\n"
-    print(print_movies_string)
 
+    print(print_movies_string)
     user_input_press_enter_to_continue()
 
 
-def add_movie_screen(movies: dict, movie_name=None):
+def add_movie_screen(movie_name: str = None):
     """
         Add a new movie to the movies dictionary with a given name, rating, and year.
         If the input data is invalid, an error message will be displayed
@@ -182,33 +176,38 @@ def add_movie_screen(movies: dict, movie_name=None):
     else:
         input_movie_name = user_input_text("Enter a new movie name: ")
 
-    input_movie_rating = user_input_text("Enter new movie rating: ")
-    input_movie_year = user_input_text("Enter the release year: ")
-
+    # input_movie_rating = user_input_text("Enter new movie rating: ")
+    # input_movie_year = user_input_text("Enter the release year: ")
+    search_result = omdbapi_api_handler.search_by_title(input_movie_name)
     print_clear_screen_and_menu_title()
 
     # print message depends on if the year and rating is valid
-    if is_movie_rating_valid(input_movie_rating) and is_movie_year_valid(input_movie_year):
-        add_movie_to_dict(movies, input_movie_name, input_movie_rating, input_movie_year)
+    if search_result["Response"] == "True":
+        movie_title = search_result["Title"]
+        movie_year, image_url = int(search_result["Year"]), search_result["Poster"]
+        movie_rating = float((search_result["Ratings"][0]["Value"]).split("/")[0])
+        movie_storage.add_movie(movie_title, movie_year, movie_rating, image_url)
         print(f"Movie {input_movie_name} successfully added/updated")
     else:
-        print(error_text_red_color("Invalid data."))
+        print(error_text_red_color(f"{search_result['Error']}"))
 
     user_input_press_enter_to_continue()
 
 
-def delete_movie_screen(movies: dict):
+def delete_movie_screen():
     """
         deletes a movie from the movies dictionary based on user input for
         the movie name.If the movie exists in the dictionary, it will be
         deleted and a success message  will be displayed. If the movie
         does not exist in the dictionary, an error message will be displayed.
     """
+    movies = movie_storage.load_data()
     print_clear_screen_and_menu_title()
     input_movie_to_delete = user_input_text("Enter movie name to delete: ")
     print_clear_screen_and_menu_title()
+
     if input_movie_to_delete in movies:
-        del movies[input_movie_to_delete]
+        movie_storage.delete_movie(input_movie_to_delete)
         message_to_print = f"Movie {input_movie_to_delete} successfully deleted"
     else:
         message_to_print = error_text_red_color(f"Movie {input_movie_to_delete} doesn't exist!")
@@ -218,56 +217,68 @@ def delete_movie_screen(movies: dict):
     user_input_press_enter_to_continue()
 
 
-def update_movie_screen(movies: dict) -> None:
+def update_movie_screen() -> None:
     """
         Updates the rating of an existing movie in the movie's dictionary.
         If the movie doesn't exist, an error message is displayed
     """
+    movies = movie_storage.load_data()
     print_clear_screen_and_menu_title()
     input_movie_name = user_input_text("Enter movie name: ")
 
+    # if movie and rating valid - update database.
+    # also create a message for print for every case
     if input_movie_name in movies:
         input_movie_rating = user_input_text("Enter new movie rating (0-10): ")
         if is_movie_rating_valid(input_movie_rating):
-            add_movie_to_dict(movies, input_movie_name, input_movie_rating)
+            movie_rating_float = round(float(input_movie_rating), 1)
+            movie_storage.update_movie(input_movie_name, movie_rating_float)
+
             print_clear_screen_and_menu_title()
-            print(f"Movie {input_movie_name} successfully updated")
+            output_string = f"Movie {input_movie_name} successfully updated"
         else:
             print_clear_screen_and_menu_title()
-            print(error_text_red_color(f"Rating {input_movie_rating} is invalid"))
+            output_string = error_text_red_color(f"Rating {input_movie_rating} is invalid")
     else:
         print_clear_screen_and_menu_title()
-        print(error_text_red_color(f"Movie {input_movie_name} doesn't exist!"))
+        output_string = error_text_red_color(f"Movie {input_movie_name} doesn't exist!")
 
+    print(output_string)
     user_input_press_enter_to_continue()
 
 
-def print_stats_screen(movies: dict) -> None:
+def print_stats_screen() -> None:
     """
         Prints statistics about the movie's database,
         including the average and median ratings,
         and the best and worst rated movies.
     """
+    movies = movie_storage.load_data()
     average_rating = round(sum(data["rating"] for data in movies.values()) / len(movies), 1)
     median_rating = round(statistics.median(data["rating"] for data in movies.values()), 1)
     best_movie_name = max(movies, key=lambda movie: movies[movie]["rating"])
+    best_movie_data = {"rating": movies[best_movie_name]["rating"], "year": movies[best_movie_name]["year"]}
     worst_movie_name = min(movies, key=lambda movie: movies[movie]["rating"])
+    worst_movie_data = {"rating": movies[worst_movie_name]["rating"], "year": movies[worst_movie_name]["year"]}
 
     stats_string = f"""Average rating: {average_rating}
-    Median rating: {median_rating}
-    Best movie: {best_movie_name}, {movies[best_movie_name]}
-    Worst movie: {worst_movie_name}, {movies[worst_movie_name]}"""
+Median rating: {median_rating}
+Best movie: {best_movie_name} {best_movie_data}
+Worst movie: {worst_movie_name}, {worst_movie_data}"""
 
     print_clear_screen_and_menu_title()
     print(stats_string)
     user_input_press_enter_to_continue()
 
 
-def print_random_movie_screen(movies: dict):
+def print_random_movie_screen():
     """Prints a random movie from the database with its rating and year"""
+    movies = movie_storage.load_data()
     random_movie_name = random.choice(list(movies.keys()))
     print_clear_screen_and_menu_title()
-    print(f"Your movie for tonight: {random_movie_name}  {movies[random_movie_name]}")
+    random_movie_data = {"rating": movies[random_movie_name]["rating"],
+                         "year": movies[random_movie_name]["year"]}
+    print(f"Your movie for tonight: {random_movie_name}  {random_movie_data}")
     user_input_press_enter_to_continue()
 
 
@@ -290,8 +301,9 @@ def search_movie_by_fuzzy_matching(movies: dict, input_movie_name: str) -> list:
 def create_str_for_found_movies(found_movies_part_name: dict) -> str:
     """create a string that represent found movies and returns it"""
     output_string = ""
-    for movie, rating in found_movies_part_name.items():
-        output_string += f"{movie}, {rating}\n"
+    for movie, data in found_movies_part_name.items():
+        movie_data = {"rating": data["rating"], "year": data["year"]}
+        output_string += f"{movie}, {movie_data}\n"
 
     return output_string.rstrip()  # removing last \n
 
@@ -310,13 +322,14 @@ def create_str_for_fuzzy_matches(found_movies_fuzzy_matching, input_movie_name):
     return output_str
 
 
-def search_movie_by_name_screen(movies: dict):
+def search_movie_by_name_screen():
     """
         Search for a movie by a partial or fuzzy match to its name and displays
         the results to the user. If there is an exact match, it will display the
         movie's rating and year. If there are no exact matches, it will suggest
         fuzzy matches and prompt the user to choose from the suggestions.
     """
+    movies = movie_storage.load_data()
     print_clear_screen_and_menu_title()
 
     input_movie_name = user_input_text("Enter part of movie name: ")
@@ -344,8 +357,9 @@ def sort_movies_by_rating(movies) -> dict:
     return sorted_dict
 
 
-def print_sorted_movies_by_rating_screen(movies: dict) -> None:
+def print_sorted_movies_by_rating_screen() -> None:
     """Prints a sorted list of movies by rating on the screen"""
+    movies = movie_storage.load_data()
     ordered_movies_by_rating = sort_movies_by_rating(movies)
 
     print_result = ""
@@ -373,6 +387,7 @@ def print_menu():
 7. Search movie
 8. Movies sorted by rating
 9. Create Rating Histogram
+10.Generate website
 """
     print(menu_string)
 
@@ -386,14 +401,14 @@ def create_and_save_histogram(movies: dict, input_file_name: str) -> None:
     plt.savefig(input_file_name + ".png")
 
 
-def create_histogram_in_file_screen(movies):
+def create_histogram_in_file_screen():
     """
     Displays a menu screen with instructions to enter a file name to save the histogram.
-    Calls the `create_and_save_histogram` function with the `movies` dictionary and the
-    user input file name. Saves the histogram in a PNG file with the given name in the
+    Saves the histogram in a PNG file with the given name in the
     current directory. Displays a message with the name of the file where the histogram
     was saved, and waits for the user to press Enter to continue.
     """
+    movies = movie_storage.load_data()
     print_clear_screen_and_menu_title()
 
     input_file_name = user_input_text("Name the file to save histogram: ")
