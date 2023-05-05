@@ -61,7 +61,11 @@ body {
   left: 0;
   margin: 0;
 }
-
+.country_flag{
+    position: absolute;
+    top: 18px;
+    left: 0;
+}
 .imdb em{
  font-weight: bold
 }

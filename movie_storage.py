@@ -34,11 +34,11 @@ def add_movie(data) -> None:
     """
     title, imdb_id = data["Title"], data["imdbID"]
     year, image_url = int(data["Year"]), data["Poster"]
-    rating = float(data["imdbRating"])
+    rating, country = float(data["imdbRating"]), data["Country"]
 
     movies = load_data()
     movies[title] = {"rating": rating, "year": year, "image": image_url,
-                     "imdb_id": imdb_id, "country": [data["country"]]}
+                     "imdb_id": imdb_id, "country": country}
 
     save_data(movies)
 
