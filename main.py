@@ -15,6 +15,10 @@ MY_OS = sys.platform
 
 
 def main():
+    # movies = movie_storage.load_data()
+    # for movie in movies:
+    #     data = omdbapi_api_handler.search_by_title(movie)
+    #     movie_storage.add_movie(data)
     """
        Main entry point for the program. It prints a menu of options
         for the user to choose from, and executes the corresponding
@@ -29,11 +33,11 @@ def main():
 
 def execute_user_input(user_input: str) -> None:
     """
-       This function executes the corresponding functionality based on the user's input.
+   This function executes the corresponding functionality based on the user's input.
 
-       :param user_input: The user's input choice.
-       :param movies: A dictionary of movies with their ratings and release years.
-       :return: None
+   :param user_input: The user's input choice.
+   :param movies: A dictionary of movies with their ratings and release years.
+   :return: None
     """
     menu_functions_dict = {
         "0": exit_program,
@@ -99,11 +103,11 @@ def print_clear_screen_and_menu_title() -> None:
 
 def search_movie_by_part_name(movies: dict, part_of_name: str) -> dict:
     """
-        searches for movies whose names contain a given string as a substring.
-        It takes two arguments: movies, which is a dictionary containing movies
-        and their data, and part_of_name, which is the string to search for.
-        It returns a dictionary containing the movies whose names
-        contain part_of_name as a substring.
+    searches for movies whose names contain a given string as a substring.
+    It takes two arguments: movies, which is a dictionary containing movies
+    and their data, and part_of_name, which is the string to search for.
+    It returns a dictionary containing the movies whose names
+    contain part_of_name as a substring.
     """
     part_of_name = part_of_name.lower()
 
@@ -111,18 +115,6 @@ def search_movie_by_part_name(movies: dict, part_of_name: str) -> dict:
     found_movies_dict = {key: value for key, value in movies.items() if part_of_name in key.lower()}
 
     return found_movies_dict
-
-
-def is_movie_rating_valid(rank: str) -> bool:
-    """Checks if rating of a movie is in the right range. Returns bool"""
-    try:
-        rank_float = float(rank)
-        if 0 <= rank_float <= 10:
-            return True
-    except ValueError:
-        pass
-
-    return False
 
 
 def is_movie_year_valid(year: str) -> bool:
@@ -145,9 +137,9 @@ def user_input_press_enter_to_continue() -> None:
 
 def print_movies_list():
     """
-        Prints a list of movies with their ratings and release years.
-        It first clears the screen, then prints the movies in a formatted string,
-        and waits for the user to press Enter to continue.
+    Prints a list of movies with their ratings and release years.
+    It first clears the screen, then prints the movies in a formatted string,
+    and waits for the user to press Enter to continue.
     """
     movies = movie_storage.load_data()
     print_clear_screen_and_menu_title()
@@ -166,8 +158,8 @@ def print_movies_list():
 
 def add_movie_screen(movie_name: str = None):
     """
-        Add a new movie to the movies dictionary with a given name, rating, and year.
-        If the input data is invalid, an error message will be displayed
+    Add a new movie to the movies dictionary with a given name, rating, and year.
+    If the input data is invalid, an error message will be displayed
     """
     print_clear_screen_and_menu_title()
 
@@ -176,17 +168,15 @@ def add_movie_screen(movie_name: str = None):
     else:
         input_movie_name = user_input_text("Enter a new movie name: ")
 
-    # input_movie_rating = user_input_text("Enter new movie rating: ")
-    # input_movie_year = user_input_text("Enter the release year: ")
     search_result = omdbapi_api_handler.search_by_title(input_movie_name)
     print_clear_screen_and_menu_title()
 
     # print message depends on if the year and rating is valid
     if search_result["Response"] == "True":
         movie_title = search_result["Title"]
-        movie_year, image_url = int(search_result["Year"]), search_result["Poster"]
-        movie_rating = float((search_result["Ratings"][0]["Value"]).split("/")[0])
-        movie_storage.add_movie(movie_title, movie_year, movie_rating, image_url)
+        # movie_year, image_url = int(search_result["Year"]), search_result["Poster"]
+        # movie_rating = float(search_result["imdbRating"])
+        movie_storage.add_movie(search_result)
         print(f"Movie {input_movie_name} successfully added/updated")
     else:
         print(error_text_red_color(f"{search_result['Error']}"))
@@ -196,10 +186,10 @@ def add_movie_screen(movie_name: str = None):
 
 def delete_movie_screen():
     """
-        deletes a movie from the movies dictionary based on user input for
-        the movie name.If the movie exists in the dictionary, it will be
-        deleted and a success message  will be displayed. If the movie
-        does not exist in the dictionary, an error message will be displayed.
+    deletes a movie from the movies dictionary based on user input for
+    the movie name.If the movie exists in the dictionary, it will be
+    deleted and a success message  will be displayed. If the movie
+    does not exist in the dictionary, an error message will be displayed.
     """
     movies = movie_storage.load_data()
     print_clear_screen_and_menu_title()
@@ -219,26 +209,19 @@ def delete_movie_screen():
 
 def update_movie_screen() -> None:
     """
-        Updates the rating of an existing movie in the movie's dictionary.
-        If the movie doesn't exist, an error message is displayed
+    Updates the rating of an existing movie in the movie's dictionary.
+    If the movie doesn't exist, an error message is displayed
     """
     movies = movie_storage.load_data()
     print_clear_screen_and_menu_title()
     input_movie_name = user_input_text("Enter movie name: ")
 
-    # if movie and rating valid - update database.
-    # also create a message for print for every case
+    # if movie exist -> update  notes and creates output_string for a menu
     if input_movie_name in movies:
-        input_movie_rating = user_input_text("Enter new movie rating (0-10): ")
-        if is_movie_rating_valid(input_movie_rating):
-            movie_rating_float = round(float(input_movie_rating), 1)
-            movie_storage.update_movie(input_movie_name, movie_rating_float)
-
-            print_clear_screen_and_menu_title()
-            output_string = f"Movie {input_movie_name} successfully updated"
-        else:
-            print_clear_screen_and_menu_title()
-            output_string = error_text_red_color(f"Rating {input_movie_rating} is invalid")
+        input_movie_note = user_input_text("Enter movie notes: ")
+        movie_storage.update_movie(input_movie_name, input_movie_note)
+        print_clear_screen_and_menu_title()
+        output_string = f"Movie {input_movie_name} successfully updated"
     else:
         print_clear_screen_and_menu_title()
         output_string = error_text_red_color(f"Movie {input_movie_name} doesn't exist!")
@@ -249,9 +232,9 @@ def update_movie_screen() -> None:
 
 def print_stats_screen() -> None:
     """
-        Prints statistics about the movie's database,
-        including the average and median ratings,
-        and the best and worst rated movies.
+    Prints statistics about the movie's database,
+    including the average and median ratings,
+    and the best and worst rated movies.
     """
     movies = movie_storage.load_data()
     average_rating = round(sum(data["rating"] for data in movies.values()) / len(movies), 1)
