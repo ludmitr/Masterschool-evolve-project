@@ -15,14 +15,10 @@ MY_OS = sys.platform
 
 
 def main():
-    # movies = movie_storage.load_data()
-    # for movie in movies:
-    #     data = omdbapi_api_handler.search_by_title(movie)
-    #     movie_storage.add_movie(data)
     """
-       Main entry point for the program. It prints a menu of options
-        for the user to choose from, and executes the corresponding
-       functionality based on the user's input.
+    Main entry point for the program. It prints a menu of options
+    for the user to choose from, and executes the corresponding
+    functionality based on the user's input.
     """
     # continuously displays the main menu, takes user input, and execute
     while True:
@@ -267,8 +263,8 @@ def print_random_movie_screen():
 
 def search_movie_by_fuzzy_matching(movies: dict, input_movie_name: str) -> list:
     """
-        This function searches for movie names in a dictionary using fuzzy matching
-        and returns a list of matching movie names.
+    This function searches for movie names in a dictionary using fuzzy matching
+    and returns a list of matching movie names.
     """
     approved_matching_score = 65
 
@@ -307,10 +303,10 @@ def create_str_for_fuzzy_matches(found_movies_fuzzy_matching, input_movie_name):
 
 def search_movie_by_name_screen():
     """
-        Search for a movie by a partial or fuzzy match to its name and displays
-        the results to the user. If there is an exact match, it will display the
-        movie's rating and year. If there are no exact matches, it will suggest
-        fuzzy matches and prompt the user to choose from the suggestions.
+    Search for a movie by a partial or fuzzy match to its name and displays
+    the results to the user. If there is an exact match, it will display the
+    movie's rating and year. If there are no exact matches, it will suggest
+    fuzzy matches and prompt the user to choose from the suggestions.
     """
     movies = movie_storage.load_data()
     print_clear_screen_and_menu_title()

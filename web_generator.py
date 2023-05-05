@@ -1,5 +1,6 @@
 import movie_storage
 import os
+import flags_api_handler
 
 NEW_WEB_PATH = os.path.join("_static", "index.html")
 TEMPLATE_PATH = os.path.join("_static", "index_template.html")
@@ -27,9 +28,6 @@ def generate_web() -> None:
     # generate html representation of movies
     generated_movies_html = ""
     for movie, data in movies.items():
-        # year, image_url, = data["year"], data["image"]
-        # note, rating = data.get("note", ""), data["rating"]
-        # imdb_path = IMDB_PATH + data["imdbID"]
         generated_movies_html += generate_movie(movie, data)
 
     generated_web = generated_web.replace("__TEMPLATE_MOVIE_GRID__", generated_movies_html)
@@ -44,6 +42,10 @@ def generate_movie(movie_title, data) -> str:
     movie_html += f"<img class='movie-poster' src='{data['image']}' title='{data.get('note','')}'/>\n"
     movie_html += f"</a>"
     movie_html += f"<div class='imdb'><em>IMDb:</em> {data['rating']}</div>\n"
+    flag_url = flags_api_handler.get_flag_html_link(data["country"])
+    if flag_url:
+        movie_html += f"<img class='country_flag' " \
+                      f"src='{flags_api_handler.get_flag_html_link(data['country'])}'/>\n"
     movie_html += f"<div class='movie-title'>{movie_title}</div>\n"
     movie_html += f"<div class='movie-year'>{data['year']}</div>\n"
     movie_html += "</div>\n"
