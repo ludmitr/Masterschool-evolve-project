@@ -31,7 +31,6 @@ def execute_user_input(user_input: str) -> None:
    This function executes the corresponding functionality based on the user's input.
 
    :param user_input: The user's input choice.
-   :param movies: A dictionary of movies with their ratings and release years.
    :return: None
     """
     menu_functions_dict = {
