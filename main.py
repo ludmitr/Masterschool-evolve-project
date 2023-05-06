@@ -2,7 +2,6 @@ import os
 import random
 import statistics
 import sys
-import datetime
 import numpy as np
 from matplotlib import pyplot as plt
 from fuzzywuzzy import fuzz
@@ -113,19 +112,6 @@ def search_movie_by_part_name(movies: dict, part_of_name: str) -> dict:
     return found_movies_dict
 
 
-def is_movie_year_valid(year: str) -> bool:
-    """Checking if the year is a valid number. Return bool.."""
-    current_year = datetime.datetime.now().year
-    try:
-        year = int(year)
-        if 1850 <= year <= current_year:
-            return True
-    except ValueError:
-        pass
-
-    return False
-
-
 def user_input_press_enter_to_continue() -> None:
     """user input to continue with color"""
     input(Fore.LIGHTBLUE_EX + "\nPress enter to continue" + Fore.RESET)
@@ -169,11 +155,8 @@ def add_movie_screen(movie_name: str = None):
 
     # print message depends on if the year and rating is valid
     if search_result["Response"] == "True":
-        movie_title = search_result["Title"]
-        # movie_year, image_url = int(search_result["Year"]), search_result["Poster"]
-        # movie_rating = float(search_result["imdbRating"])
         movie_storage.add_movie(search_result)
-        print(f"Movie {input_movie_name} successfully added/updated")
+        print(f"Movie {search_result['Title']} successfully added/updated")
     else:
         print(error_text_red_color(f"{search_result['Error']}"))
 
@@ -236,9 +219,11 @@ def print_stats_screen() -> None:
     average_rating = round(sum(data["rating"] for data in movies.values()) / len(movies), 1)
     median_rating = round(statistics.median(data["rating"] for data in movies.values()), 1)
     best_movie_name = max(movies, key=lambda movie: movies[movie]["rating"])
-    best_movie_data = {"rating": movies[best_movie_name]["rating"], "year": movies[best_movie_name]["year"]}
+    best_movie_data = {"rating": movies[best_movie_name]["rating"],
+                       "year": movies[best_movie_name]["year"]}
     worst_movie_name = min(movies, key=lambda movie: movies[movie]["rating"])
-    worst_movie_data = {"rating": movies[worst_movie_name]["rating"], "year": movies[worst_movie_name]["year"]}
+    worst_movie_data = {"rating": movies[worst_movie_name]["rating"],
+                        "year": movies[worst_movie_name]["year"]}
 
     stats_string = f"""Average rating: {average_rating}
 Median rating: {median_rating}
