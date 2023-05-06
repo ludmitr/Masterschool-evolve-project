@@ -26,21 +26,26 @@ def load_data():
         return json.loads(file.read())
 
 
-def add_movie(title: str, year: int, rating: float, image_url):
+def add_movie(data) -> None:
     """
-    Adds a movie to the movies database.
+    Adds a movie to the movie's database.
     Loads the information from the JSON file, add the movie,
     and saves it. The function doesn't need to validate the input.
     """
-    movies: dict = load_data()
-    movies[title] = {"rating": rating, "year": year, "image": image_url}
+    title, imdb_id = data["Title"], data["imdbID"]
+    year, image_url = int(data["Year"]), data["Poster"]
+    rating, country = float(data["imdbRating"]), data["Country"]
+
+    movies = load_data()
+    movies[title] = {"rating": rating, "year": year, "image": image_url,
+                     "imdb_id": imdb_id, "country": country}
 
     save_data(movies)
 
 
-def delete_movie(title):
+def delete_movie(title: str) -> None:
     """
-    Deletes a movie from the movies database.
+    Deletes a movie from the movie's database.
     Loads the information from the JSON file, deletes the movie,
     and saves it. The function doesn't need to validate the input.
     """
@@ -51,19 +56,19 @@ def delete_movie(title):
     save_data(movies)
 
 
-def update_movie(title, rating):
+def update_movie(title: str, note: str) -> None:
     """
-    Updates a movie from the movies database.
+    Updates a movie from the movie's database.
     Loads the information from the JSON file, updates the movie,
     and saves it. The function doesn't need to validate the input.
     """
     movies = load_data()
-    movies[title]["rating"] = rating
+    movies[title]["note"] = note
 
     save_data(movies)
 
 
-def save_data(movies: dict):
+def save_data(movies: dict) -> None:
     """Serialize the movies data in data.json"""
     with open(FILE_PATH, "w") as file:
         file.write(json.dumps(movies))

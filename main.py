@@ -2,7 +2,6 @@ import os
 import random
 import statistics
 import sys
-import datetime
 import numpy as np
 from matplotlib import pyplot as plt
 from fuzzywuzzy import fuzz
@@ -16,9 +15,9 @@ MY_OS = sys.platform
 
 def main():
     """
-       Main entry point for the program. It prints a menu of options
-        for the user to choose from, and executes the corresponding
-       functionality based on the user's input.
+    Main entry point for the program. It prints a menu of options
+    for the user to choose from, and executes the corresponding
+    functionality based on the user's input.
     """
     # continuously displays the main menu, takes user input, and execute
     while True:
@@ -29,11 +28,10 @@ def main():
 
 def execute_user_input(user_input: str) -> None:
     """
-       This function executes the corresponding functionality based on the user's input.
+   This function executes the corresponding functionality based on the user's input.
 
-       :param user_input: The user's input choice.
-       :param movies: A dictionary of movies with their ratings and release years.
-       :return: None
+   :param user_input: The user's input choice.
+   :return: None
     """
     menu_functions_dict = {
         "0": exit_program,
@@ -99,11 +97,11 @@ def print_clear_screen_and_menu_title() -> None:
 
 def search_movie_by_part_name(movies: dict, part_of_name: str) -> dict:
     """
-        searches for movies whose names contain a given string as a substring.
-        It takes two arguments: movies, which is a dictionary containing movies
-        and their data, and part_of_name, which is the string to search for.
-        It returns a dictionary containing the movies whose names
-        contain part_of_name as a substring.
+    searches for movies whose names contain a given string as a substring.
+    It takes two arguments: movies, which is a dictionary containing movies
+    and their data, and part_of_name, which is the string to search for.
+    It returns a dictionary containing the movies whose names
+    contain part_of_name as a substring.
     """
     part_of_name = part_of_name.lower()
 
@@ -113,31 +111,6 @@ def search_movie_by_part_name(movies: dict, part_of_name: str) -> dict:
     return found_movies_dict
 
 
-def is_movie_rating_valid(rank: str) -> bool:
-    """Checks if rating of a movie is in the right range. Returns bool"""
-    try:
-        rank_float = float(rank)
-        if 0 <= rank_float <= 10:
-            return True
-    except ValueError:
-        pass
-
-    return False
-
-
-def is_movie_year_valid(year: str) -> bool:
-    """Checking if the year is a valid number. Return bool.."""
-    current_year = datetime.datetime.now().year
-    try:
-        year = int(year)
-        if 1850 <= year <= current_year:
-            return True
-    except ValueError:
-        pass
-
-    return False
-
-
 def user_input_press_enter_to_continue() -> None:
     """user input to continue with color"""
     input(Fore.LIGHTBLUE_EX + "\nPress enter to continue" + Fore.RESET)
@@ -145,9 +118,9 @@ def user_input_press_enter_to_continue() -> None:
 
 def print_movies_list():
     """
-        Prints a list of movies with their ratings and release years.
-        It first clears the screen, then prints the movies in a formatted string,
-        and waits for the user to press Enter to continue.
+    Prints a list of movies with their ratings and release years.
+    It first clears the screen, then prints the movies in a formatted string,
+    and waits for the user to press Enter to continue.
     """
     movies = movie_storage.load_data()
     print_clear_screen_and_menu_title()
@@ -166,8 +139,8 @@ def print_movies_list():
 
 def add_movie_screen(movie_name: str = None):
     """
-        Add a new movie to the movies dictionary with a given name, rating, and year.
-        If the input data is invalid, an error message will be displayed
+    Add a new movie to the movies dictionary with a given name, rating, and year.
+    If the input data is invalid, an error message will be displayed
     """
     print_clear_screen_and_menu_title()
 
@@ -176,18 +149,13 @@ def add_movie_screen(movie_name: str = None):
     else:
         input_movie_name = user_input_text("Enter a new movie name: ")
 
-    # input_movie_rating = user_input_text("Enter new movie rating: ")
-    # input_movie_year = user_input_text("Enter the release year: ")
     search_result = omdbapi_api_handler.search_by_title(input_movie_name)
     print_clear_screen_and_menu_title()
 
     # print message depends on if the year and rating is valid
     if search_result["Response"] == "True":
-        movie_title = search_result["Title"]
-        movie_year, image_url = int(search_result["Year"]), search_result["Poster"]
-        movie_rating = float((search_result["Ratings"][0]["Value"]).split("/")[0])
-        movie_storage.add_movie(movie_title, movie_year, movie_rating, image_url)
-        print(f"Movie {input_movie_name} successfully added/updated")
+        movie_storage.add_movie(search_result)
+        print(f"Movie {search_result['Title']} successfully added/updated")
     else:
         print(error_text_red_color(f"{search_result['Error']}"))
 
@@ -196,10 +164,10 @@ def add_movie_screen(movie_name: str = None):
 
 def delete_movie_screen():
     """
-        deletes a movie from the movies dictionary based on user input for
-        the movie name.If the movie exists in the dictionary, it will be
-        deleted and a success message  will be displayed. If the movie
-        does not exist in the dictionary, an error message will be displayed.
+    deletes a movie from the movies dictionary based on user input for
+    the movie name.If the movie exists in the dictionary, it will be
+    deleted and a success message  will be displayed. If the movie
+    does not exist in the dictionary, an error message will be displayed.
     """
     movies = movie_storage.load_data()
     print_clear_screen_and_menu_title()
@@ -219,26 +187,19 @@ def delete_movie_screen():
 
 def update_movie_screen() -> None:
     """
-        Updates the rating of an existing movie in the movie's dictionary.
-        If the movie doesn't exist, an error message is displayed
+    Updates the rating of an existing movie in the movie's dictionary.
+    If the movie doesn't exist, an error message is displayed
     """
     movies = movie_storage.load_data()
     print_clear_screen_and_menu_title()
     input_movie_name = user_input_text("Enter movie name: ")
 
-    # if movie and rating valid - update database.
-    # also create a message for print for every case
+    # if movie exist -> update  notes and creates output_string for a menu
     if input_movie_name in movies:
-        input_movie_rating = user_input_text("Enter new movie rating (0-10): ")
-        if is_movie_rating_valid(input_movie_rating):
-            movie_rating_float = round(float(input_movie_rating), 1)
-            movie_storage.update_movie(input_movie_name, movie_rating_float)
-
-            print_clear_screen_and_menu_title()
-            output_string = f"Movie {input_movie_name} successfully updated"
-        else:
-            print_clear_screen_and_menu_title()
-            output_string = error_text_red_color(f"Rating {input_movie_rating} is invalid")
+        input_movie_note = user_input_text("Enter movie notes: ")
+        movie_storage.update_movie(input_movie_name, input_movie_note)
+        print_clear_screen_and_menu_title()
+        output_string = f"Movie {input_movie_name} successfully updated"
     else:
         print_clear_screen_and_menu_title()
         output_string = error_text_red_color(f"Movie {input_movie_name} doesn't exist!")
@@ -249,17 +210,19 @@ def update_movie_screen() -> None:
 
 def print_stats_screen() -> None:
     """
-        Prints statistics about the movie's database,
-        including the average and median ratings,
-        and the best and worst rated movies.
+    Prints statistics about the movie's database,
+    including the average and median ratings,
+    and the best and worst rated movies.
     """
     movies = movie_storage.load_data()
     average_rating = round(sum(data["rating"] for data in movies.values()) / len(movies), 1)
     median_rating = round(statistics.median(data["rating"] for data in movies.values()), 1)
     best_movie_name = max(movies, key=lambda movie: movies[movie]["rating"])
-    best_movie_data = {"rating": movies[best_movie_name]["rating"], "year": movies[best_movie_name]["year"]}
+    best_movie_data = {"rating": movies[best_movie_name]["rating"],
+                       "year": movies[best_movie_name]["year"]}
     worst_movie_name = min(movies, key=lambda movie: movies[movie]["rating"])
-    worst_movie_data = {"rating": movies[worst_movie_name]["rating"], "year": movies[worst_movie_name]["year"]}
+    worst_movie_data = {"rating": movies[worst_movie_name]["rating"],
+                        "year": movies[worst_movie_name]["year"]}
 
     stats_string = f"""Average rating: {average_rating}
 Median rating: {median_rating}
@@ -284,8 +247,8 @@ def print_random_movie_screen():
 
 def search_movie_by_fuzzy_matching(movies: dict, input_movie_name: str) -> list:
     """
-        This function searches for movie names in a dictionary using fuzzy matching
-        and returns a list of matching movie names.
+    This function searches for movie names in a dictionary using fuzzy matching
+    and returns a list of matching movie names.
     """
     approved_matching_score = 65
 
@@ -324,10 +287,10 @@ def create_str_for_fuzzy_matches(found_movies_fuzzy_matching, input_movie_name):
 
 def search_movie_by_name_screen():
     """
-        Search for a movie by a partial or fuzzy match to its name and displays
-        the results to the user. If there is an exact match, it will display the
-        movie's rating and year. If there are no exact matches, it will suggest
-        fuzzy matches and prompt the user to choose from the suggestions.
+    Search for a movie by a partial or fuzzy match to its name and displays
+    the results to the user. If there is an exact match, it will display the
+    movie's rating and year. If there are no exact matches, it will suggest
+    fuzzy matches and prompt the user to choose from the suggestions.
     """
     movies = movie_storage.load_data()
     print_clear_screen_and_menu_title()

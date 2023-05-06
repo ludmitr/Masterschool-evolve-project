@@ -29,6 +29,7 @@ body {
 
 .movie {
   width: 140px;
+  position: relative;
 }
 
 .movie-title,
@@ -45,9 +46,26 @@ body {
   color: #999;
 }
 
-
 .movie-poster {
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
-    width: 128px;
-    height: 193px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+  width: 128px;
+  height: 193px;
+}
+
+.imdb {
+  font-size: 0.5em;
+  background-color: rgb(245, 197, 24); /* semi-transparent black background */
+  padding: 5px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 0;
+}
+.country_flag{
+    position: absolute;
+    top: 18px;
+    left: 0;
+}
+.imdb em{
+ font-weight: bold
 }
