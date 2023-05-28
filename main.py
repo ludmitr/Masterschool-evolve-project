@@ -152,7 +152,7 @@ def add_movie_screen(movie_name: str = None):
     search_result = omdbapi_api_handler.search_by_title(input_movie_name)
     print_clear_screen_and_menu_title()
 
-    # print message depends on if the year and rating is valid
+    # print message depends on result of search
     if search_result["Response"] == "True":
         movie_storage.add_movie(search_result)
         print(f"Movie {search_result['Title']} successfully added/updated")
@@ -271,7 +271,7 @@ def create_str_for_found_movies(found_movies_part_name: dict) -> str:
     return output_string.rstrip()  # removing last \n
 
 
-def create_str_for_fuzzy_matches(found_movies_fuzzy_matching, input_movie_name):
+def create_str_for_fuzzy_matches(found_movies_fuzzy_matching, input_movie_name) -> str:
     """Creates string that represent matching results for fuzzy search"""
     output_str = ""
     if len(found_movies_fuzzy_matching) > 0:
