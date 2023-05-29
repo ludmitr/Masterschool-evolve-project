@@ -1,8 +1,10 @@
 import random
 import statistics
-
+import numpy as np
+from matplotlib import pyplot as plt
 from fuzzywuzzy import fuzz
 
+import web_generator
 from istorage import IStorage
 import sys
 from colorama import Fore
@@ -198,26 +200,65 @@ class MovieApp:
     def _sorted_movies_by_rating_command(self) -> None:
         """Prints a sorted list of movies by rating on the screen"""
         movies = self._storage.load_data()
-        ordered_movies_by_rating = self._sort_movies_by_rating(movies)
+        ordered_movies_by_rating: list = self._sort_movies_by_rating(movies)
 
         print_result = ""
-        for movie, data in ordered_movies_by_rating.items():
-            print_result += f"{movie}: {data['rating']}\n"
+        for data in ordered_movies_by_rating:
+            print_result += f"{data[0]}: {data[1]['rating']}\n"
         print_result = print_result.rstrip()  # remove last \n
 
         self._print_clear_screen_and_menu_title()
         print(print_result)
         self._user_input_press_enter_to_continue()
 
-    def _sort_movies_by_rating(self, movies: dict) -> dict:
+    def _create_histogram_in_file_command(self):
         """
-            Return new dictionary of movies sorted by rating in descending order
+        Displays a menu screen with instructions to enter a file name to save
+        the histogram.Saves the histogram in a PNG file with the given name in
+        the current directory. Displays a message with the name of the file
+        where the histogram was saved.
         """
-        sorted_dict = dict(sorted(movies.items(),
-                                  key=lambda movie_data: movie_data[1][
-                                      'rating'],
-                                  reverse=True))
-        return sorted_dict
+        movies = self._storage.load_data()
+        self._print_clear_screen_and_menu_title()
+
+        input_file_name = self._user_input_text("Name the file to "
+                                                "save histogram: ")
+        self._create_and_save_histogram(movies, input_file_name)
+
+        self._print_clear_screen_and_menu_title()
+        print(f"Histogram saved in file named {input_file_name}")
+        self._user_input_press_enter_to_continue()
+
+    def _generate_website_screen(self):
+        """Generate website"""
+        self._print_clear_screen_and_menu_title()
+
+        movies = self._storage.load_data()
+        web_generator.generate_web(movies)
+        print("Website was generated successfully")
+
+        self._user_input_press_enter_to_continue()
+
+    def _create_and_save_histogram(self, movies: dict, input_file_name: str):
+        """Creates a histogram of movie ratings and saves it to
+         a file with the input_file_name."""
+        movies_np = np.array([movies[movie]["rating"] for movie in movies])
+        _, plot_axes = plt.subplots(figsize=(10, 7))
+        plot_axes.hist(movies_np,
+                       bins=[0, 1, 2, 3, 4, 5, 6.5, 7.5, 8, 8.5, 9, 10])
+
+        # saving file
+        plt.savefig(input_file_name + ".png")
+
+    def _sort_movies_by_rating(self, movies: dict) -> list:
+        """
+        Return list of movies sorted by rating in descending order
+        """
+
+        sorted_list = sorted(movies.items(),
+                             key=lambda movie_data: movie_data[1]['rating'],
+                             reverse=True)
+        return sorted_list
 
     def _create_str_for_fuzzy_matches(self, found_movies_fuzzy_matching,
                                       input_movie_name) -> str:
