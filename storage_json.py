@@ -1,13 +1,36 @@
+
+"""
+storage_json.py
+This module provides a StorageJson class implementing the IStorage interface.
+It manages a movie database stored in a JSON file.
+
+This module is designed for flexible movie data handling, providing a
+user-friendly interface for managing a movie database.
+It supports adding, deleting, updating, and loading movie data from a JSON file.
+
+The module relies on a valid JSON file at a specified path.
+If the file does not exist, an exception is raised.
+"""
 from istorage import IStorage
 import json
 import os
 
 class StorageJson(IStorage):
     def __init__(self, file_path):
-        if os.path.exists(file_path):
-            self._file_path = file_path
+        self.file_path = file_path
+
+
+    @property
+    def file_path(self):
+        return self._file_path
+
+    @file_path.setter
+    def file_path(self, path):
+        if os.path.exists(path):
+            self._file_path = path
         else:
-            raise FileNotFoundError(f"No such file or directory: '{file_path}'")
+            raise FileNotFoundError(f"No such file or directory: '{path}'")
+
 
     def _save_data(self, movies: dict) -> None:
         """Serialize the movies data in data.json"""

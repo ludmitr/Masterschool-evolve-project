@@ -149,7 +149,7 @@ def add_movie_screen(movie_name: str = None):
     else:
         input_movie_name = user_input_text("Enter a new movie name: ")
 
-    search_result = omdbapi_api_handler.search_by_title(input_movie_name)
+    search_result: dict = omdbapi_api_handler.search_by_title(input_movie_name)
     print_clear_screen_and_menu_title()
 
     # print message depends on result of search

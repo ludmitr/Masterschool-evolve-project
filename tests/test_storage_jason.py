@@ -14,6 +14,11 @@ def test_init():
                        match="No such file or directory: '../wrong_name.json'"):
         test_storage = StorageJson("../wrong_name.json")
 
+def test_file_path_property():
+    assert storage.file_path == "../data.json"
+    with pytest.raises(FileNotFoundError):
+        storage.file_path = "../wrong_file_name.json"
+
 
 def test_load_data():
     assert isinstance(storage.load_data(), dict), "load_data return dict"
