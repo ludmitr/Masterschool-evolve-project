@@ -3,7 +3,6 @@ import statistics
 import numpy as np
 from matplotlib import pyplot as plt
 from fuzzywuzzy import fuzz
-
 import web_generator
 from istorage import IStorage
 import sys
@@ -12,13 +11,48 @@ import os
 import omdbapi_api_handler
 
 
-
 class MovieApp:
+    """
+    The MovieApp class provides a command-line interface for users to perform
+    various operations on movies, such as listing movies, adding movies,
+    deleting movies, updating movie information, retrieving statistics,
+    generating random movies, searching for movies, sorting movies by rating,
+    creating rating histograms, and generating a website.
+    """
     def __init__(self, storage: IStorage):
         self._storage = storage
         # assign clear command for command line depending on OS
         self._clear_command = "clear" if sys.platform in ["darwin",
                                                           "linux"] else "cls"
+        self._menu_map = {
+                        "0": self._exit_program,
+                        "1": self._list_movies_command,
+                        "2": self._add_movie_command,
+                        "3": self._delete_movie_command,
+                        "4": self._update_movie_command,
+                        "5": self._statistics_command,
+                        "6": self._random_movie_command,
+                        "7": self._search_movie_by_name_command,
+                        "8": self._sorted_movies_by_rating_command,
+                        "9": self._create_histogram_in_file_command,
+                        "10": self._generate_website_command}
+
+    def run(self):
+        """
+        Starts and runs the movie application.
+
+        Displays a menu to the user and executes the corresponding command
+        based on their input. The user can choose options from 0 to 10, each
+        representing a specific command. The method continuously loops until
+        the user chooses to exit the program (option 0).
+        """
+        while True:
+            self._print_menu()
+            user_input = input(
+                Fore.LIGHTBLUE_EX + "Enter choice (0-10): " + Fore.RESET)
+            if user_input in self._menu_map:
+                self._menu_map[user_input]()
+
 
     def _exit_program(self) -> None:
         """prints a message and exits the program"""
@@ -127,7 +161,7 @@ class MovieApp:
         print(output_string)
         self._user_input_press_enter_to_continue()
 
-    def print_stats_command(self) -> None:
+    def _statistics_command(self) -> None:
         """
         Prints statistics about the movie's database,
         including the average and median ratings,
@@ -151,15 +185,15 @@ class MovieApp:
 
         # creating output string with statistics data
         stats_string = f"""Average rating: {average_rating}
-    Median rating: {median_rating}
-    Best movie: {best_movie_name} {best_movie_data}
-    Worst movie: {worst_movie_name}, {worst_movie_data}"""
+Median rating: {median_rating}
+Best movie: {best_movie_name} {best_movie_data}
+Worst movie: {worst_movie_name}, {worst_movie_data}"""
 
         self._print_clear_screen_and_menu_title()
         print(stats_string)
         self._user_input_press_enter_to_continue()
 
-    def print_random_movie_command(self):
+    def _random_movie_command(self):
         """Prints a random movie from the database with its rating and year"""
         movies = self._storage.load_data()
         random_movie_name = random.choice(list(movies.keys()))
@@ -170,7 +204,7 @@ class MovieApp:
               f"{random_movie_data}")
         self._user_input_press_enter_to_continue()
 
-    def search_movie_by_name_command(self):
+    def _search_movie_by_name_command(self):
         """
         Search for a movie by a partial or fuzzy match to its name and displays
         the results to the user. If there is an exact match, it will display the
@@ -229,7 +263,7 @@ class MovieApp:
         print(f"Histogram saved in file named {input_file_name}")
         self._user_input_press_enter_to_continue()
 
-    def _generate_website_screen(self):
+    def _generate_website_command(self):
         """Generate website"""
         self._print_clear_screen_and_menu_title()
 
@@ -312,18 +346,11 @@ class MovieApp:
         """
         part_of_name = part_of_name.lower()
 
-        # if part_of_name in key of movies, adding it element to found_movies_dict
+        # list of movies which part_of_name is part of movie name
         found_movies_dict = {key: value for key, value in movies.items() if
                              part_of_name in key.lower()}
 
         return found_movies_dict
-
-    def run(self):
-        pass
-      # Print menu
-      # Get use command
-      # Execute command
-
 
     def _user_input_press_enter_to_continue(self) -> None:
         """user input to continue with color"""
@@ -349,3 +376,22 @@ class MovieApp:
                 + Fore.RESET
         )
         print(menu_title_string)
+
+    def _print_menu(self):
+        """Prints a menu of options for the user to choose from"""
+        self._print_clear_screen_and_menu_title()
+        menu = Fore.RED + "\033[4m" + "menu:" + "\033[0m" + Fore.RESET
+        menu_string = f"""{menu}
+    0. Exit    
+    1. List movies
+    2. Add movie
+    3. Delete movie
+    4. Update movie
+    5. Stats
+    6. Random movie
+    7. Search movie
+    8. Movies sorted by rating
+    9. Create Rating Histogram
+    10.Generate website
+    """
+        print(menu_string)

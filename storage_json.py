@@ -1,21 +1,24 @@
-
 """
 storage_json.py
 This module provides a StorageJson class implementing the IStorage interface.
 It manages a movie database stored in a JSON file.
 
 This module is designed for flexible movie data handling, providing a
-user-friendly interface for managing a movie database.
+user-friendly :D interface for managing a movie database.
 It supports adding, deleting, updating, and loading movie data from a JSON file.
-
-The module relies on a valid JSON file at a specified path.
-If the file does not exist, an exception is raised.
 """
 from istorage import IStorage
 import json
 import os
 
 class StorageJson(IStorage):
+    """
+    StorageJson class provides implementation for the IStorage interface.
+    It manages and interacts with a movie database stored in a JSON file.
+    This class supports operations such as adding, deleting, updating,
+    and loading movie data. It validates the JSON file path during
+    initialization and raises a FileNotFoundError if the file does not exist.
+    """
     def __init__(self, file_path):
         self.file_path = file_path
 

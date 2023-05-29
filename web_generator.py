@@ -20,7 +20,7 @@ def save_website(web_page: str) -> None:
         file.write(web_page)
 
 
-def generate_web(movies :dict) -> None:
+def generate_web(movies: dict) -> None:
     """Generate webpage index.html that representing movies data"""
     generated_web = load_template().replace("__TEMPLATE_TITLE__", TITLE_NAME)
 
