@@ -312,12 +312,13 @@ def search_movie_by_name_screen():
 
 def sort_movies_by_rating(movies) -> dict:
     """
-        Return new dictionary of movies sorted by rating in descending order
+        Return list of movies sorted by rating in descending order
     """
-    sorted_dict = dict(sorted(movies.items(),
-                              key=lambda movie_data: movie_data[1]['rating'],
-                              reverse=True))
-    return sorted_dict
+
+    sorted_list = sorted(movies.items(),
+                          key=lambda movie_data: movie_data[1]['rating'],
+                          reverse=True)
+    return sorted_list
 
 
 def print_sorted_movies_by_rating_screen() -> None:
@@ -326,8 +327,8 @@ def print_sorted_movies_by_rating_screen() -> None:
     ordered_movies_by_rating = sort_movies_by_rating(movies)
 
     print_result = ""
-    for movie, data in ordered_movies_by_rating.items():
-        print_result += f"{movie}: {data['rating']}\n"
+    for data in ordered_movies_by_rating:
+        print_result += f"{data[0]}: {data[1]['rating']}\n"
     print_result = print_result.rstrip()  # remove last \n
 
     print_clear_screen_and_menu_title()
