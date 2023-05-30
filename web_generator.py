@@ -1,4 +1,3 @@
-import movie_storage
 import os
 import flags_api_handler
 
@@ -20,9 +19,8 @@ def save_website(web_page: str) -> None:
         file.write(web_page)
 
 
-def generate_web() -> None:
+def generate_web(movies: dict) -> None:
     """Generate webpage index.html that representing movies data"""
-    movies: dict = movie_storage.load_data()
     generated_web = load_template().replace("__TEMPLATE_TITLE__", TITLE_NAME)
 
     # generate html representation of movies
