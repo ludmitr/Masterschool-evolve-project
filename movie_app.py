@@ -169,25 +169,28 @@ class MovieApp:
         """
         movies = self._storage.load_data()
 
-        # getting statistics data
-        average_rating = round(
-            sum(data["rating"] for data in movies.values()) / len(movies), 1)
-        median_rating = round(
-            statistics.median(data["rating"] for data in movies.values()), 1)
-        best_movie_name = max(movies,
-                              key=lambda movie: movies[movie]["rating"])
-        best_movie_data = {"rating": movies[best_movie_name]["rating"],
-                           "year": movies[best_movie_name]["year"]}
-        worst_movie_name = min(movies,
-                               key=lambda movie: movies[movie]["rating"])
-        worst_movie_data = {"rating": movies[worst_movie_name]["rating"],
-                            "year": movies[worst_movie_name]["year"]}
+        if movies:
+            # getting statistics data
+            average_rating = round(
+                sum(data["rating"] for data in movies.values()) / len(movies), 1)
+            median_rating = round(
+                statistics.median(data["rating"] for data in movies.values()), 1)
+            best_movie_name = max(movies,
+                                  key=lambda movie: movies[movie]["rating"])
+            best_movie_data = {"rating": movies[best_movie_name]["rating"],
+                               "year": movies[best_movie_name]["year"]}
+            worst_movie_name = min(movies,
+                                   key=lambda movie: movies[movie]["rating"])
+            worst_movie_data = {"rating": movies[worst_movie_name]["rating"],
+                                "year": movies[worst_movie_name]["year"]}
 
-        # creating output string with statistics data
-        stats_string = f"""Average rating: {average_rating}
+            # creating output string with statistics data
+            stats_string = f"""Average rating: {average_rating}
 Median rating: {median_rating}
 Best movie: {best_movie_name} {best_movie_data}
 Worst movie: {worst_movie_name}, {worst_movie_data}"""
+        else:
+            stats_string = self._error_text_red_color("No movies in library")
 
         self._print_clear_screen_and_menu_title()
         print(stats_string)
@@ -196,12 +199,18 @@ Worst movie: {worst_movie_name}, {worst_movie_data}"""
     def _random_movie_command(self):
         """Prints a random movie from the database with its rating and year"""
         movies = self._storage.load_data()
-        random_movie_name = random.choice(list(movies.keys()))
-        self._print_clear_screen_and_menu_title()
-        random_movie_data = {"rating": movies[random_movie_name]["rating"],
-                             "year": movies[random_movie_name]["year"]}
-        print(f"Your movie for tonight: {random_movie_name}  "
-              f"{random_movie_data}")
+
+        if movies:
+            random_movie_name = random.choice(list(movies.keys()))
+            self._print_clear_screen_and_menu_title()
+            random_movie_data = {"rating": movies[random_movie_name]["rating"],
+                                 "year": movies[random_movie_name]["year"]}
+            result_to_print = f"Your movie for tonight: {random_movie_name}" \
+                              f"  {random_movie_data}"
+        else:
+            result_to_print = self._error_text_red_color("No movies in library")
+
+        print(result_to_print)
         self._user_input_press_enter_to_continue()
 
     def _search_movie_by_name_command(self):

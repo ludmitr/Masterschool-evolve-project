@@ -1,12 +1,3 @@
-"""
-storage_json.py
-This module provides a StorageJson class implementing the IStorage interface.
-It manages a movie database stored in a JSON file.
-
-This module is designed for flexible movie data handling, providing a
-user-friendly :D interface for managing a movie database.
-It supports adding, deleting, updating, and loading movie data from a JSON file.
-"""
 from istorage import IStorage
 import json
 import os
@@ -17,11 +8,11 @@ class StorageJson(IStorage):
     It manages and interacts with a movie database stored in a JSON file.
     This class supports operations such as adding, deleting, updating,
     and loading movie data. It validates the JSON file path during
-    initialization and raises a FileNotFoundError if the file does not exist.
+    initialization and raises. if file with that name does not exist
+    will create a new one.
     """
-    def __init__(self, file_path):
-        self.file_path = file_path
-
+    def __init__(self, file_name: str):
+        self.file_path = file_name
 
     @property
     def file_path(self):
@@ -29,16 +20,16 @@ class StorageJson(IStorage):
 
     @file_path.setter
     def file_path(self, path):
-        if os.path.exists(path):
-            self._file_path = path
-        else:
-            raise FileNotFoundError(f"No such file or directory: '{path}'")
-
+        path += ".json"
+        if not os.path.exists(path):
+            with open(path, 'w') as json_file:
+                json.dump({}, json_file)
+        self._file_path = path
 
     def _save_data(self, movies: dict) -> None:
-        """Serialize the movies data in data.json"""
+        """Serialize the movies dict in json file"""
         with open(self._file_path, "w") as file:
-            file.write(json.dumps(movies))
+            json.dump(movies, file)
 
     def load_data(self) -> dict:
         """
@@ -60,6 +51,7 @@ class StorageJson(IStorage):
              },
             }
            """
+
         with open(self._file_path, "r") as file:
             return json.loads(file.read())
 
@@ -100,3 +92,5 @@ class StorageJson(IStorage):
         movies[title]["note"] = note
 
         self._save_data(movies)
+
+

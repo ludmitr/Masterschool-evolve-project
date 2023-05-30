@@ -1,6 +1,9 @@
+import os.path
+from movie_app import MovieApp
+
 from storage_json import StorageJson
 import pytest
-storage = StorageJson('../data.json')
+storage = StorageJson('../movies')
 movie_to_add = {"Title": "12 Angry Men",
                 "imdbRating": 9.0,
                 "Year": 1957,
@@ -9,16 +12,10 @@ movie_to_add = {"Title": "12 Angry Men",
                 "Country": "United States"}
 
 
-def test_init():
-    with pytest.raises(FileNotFoundError,
-                       match="No such file or directory: '../wrong_name.json'"):
-        test_storage = StorageJson("../wrong_name.json")
-
-def test_file_path_property():
-    assert storage.file_path == "../data.json"
-    with pytest.raises(FileNotFoundError):
-        storage.file_path = "../wrong_file_name.json"
-
+def test_storage_doesnt_exist():
+        test_storage = StorageJson("../wrong_name")
+        assert os.path.exists("../wrong_name.json")
+        os.remove("../wrong_name.json")
 
 def test_load_data():
     assert isinstance(storage.load_data(), dict), "load_data return dict"
@@ -34,13 +31,14 @@ def test_add_movie():
     storage.add_movie(movie_to_add)
     assert movie_to_add["Title"] in storage.load_data()
 
-
 def test_update_movie():
-    movie_name = "12 Angry Men"
-    note = "i liked it"
-    storage.update_movie(movie_name, note)
+    note = "test"
+    storage = StorageJson("../test")
+    storage.add_movie(movie_to_add)
+    storage.update_movie("12 Angry Men", note)
     db = storage.load_data()
-    assert db[movie_name]["note"] == "i liked it"
+    assert db["12 Angry Men"]["note"] == "test"
+    os.remove("../test.json")
 
 
 
