@@ -53,7 +53,6 @@ class MovieApp:
             if user_input in self._menu_map:
                 self._menu_map[user_input]()
 
-
     def _exit_program(self) -> None:
         """prints a message and exits the program"""
         print("BYE!")
@@ -99,7 +98,7 @@ class MovieApp:
             input_movie_name)
         self._print_clear_screen_and_menu_title()
 
-        # print message depends on result of search.if movie found- adding to db
+        # print message depends on result of search.if movie found - adding to db
         if search_result["Response"] == "True":
             self._storage.add_movie(search_result)
             print(f"Movie {search_result['Title']} successfully added/updated")
@@ -224,15 +223,15 @@ Worst movie: {worst_movie_name}, {worst_movie_data}"""
         self._print_clear_screen_and_menu_title()
 
         input_movie_name = self._user_input_text("Enter part of movie name: ")
-        found_movies_part_name = self._search_movie_by_part_name(movies,
-                                                           input_movie_name)
+        found_movies_part_name = \
+            self._search_movie_by_part_name(movies, input_movie_name)
 
         # creating print_result string, depending on the matching result
         if found_movies_part_name:
             print_result = self._create_str_for_found_movies(found_movies_part_name)
         else:
-            found_movies_fuzzy_matching: list = self._search_movie_by_fuzzy_matching(
-                movies, input_movie_name)
+            found_movies_fuzzy_matching: list =\
+                self._search_movie_by_fuzzy_matching(movies, input_movie_name)
             print_result = self._create_str_for_fuzzy_matches(
                 found_movies_fuzzy_matching, input_movie_name)
 

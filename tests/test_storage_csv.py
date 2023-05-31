@@ -2,7 +2,6 @@ import os
 from storage_csv import StorageCsv
 import csv
 import pytest
-from movie_app import MovieApp
 
 
 

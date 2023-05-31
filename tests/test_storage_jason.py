@@ -1,5 +1,4 @@
 import os.path
-from movie_app import MovieApp
 
 from storage_json import StorageJson
 import pytest
@@ -39,8 +38,6 @@ def test_update_movie():
     db = storage.load_data()
     assert db["12 Angry Men"]["note"] == "test"
     os.remove("../test.json")
-
-
 
 
 pytest.main()

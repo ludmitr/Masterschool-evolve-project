@@ -2,6 +2,7 @@ import csv
 from istorage import IStorage
 import os
 
+
 class StorageCsv(IStorage):
     """
     This class provides implementation for the IStorage interface.
@@ -57,7 +58,7 @@ class StorageCsv(IStorage):
 
         with open(self._file_path, "r") as csv_file:
             reader = csv.reader(csv_file)
-            next(reader) #skiping headers
+            next(reader)  # skipping headers
 
             for row in reader:
                 if row:

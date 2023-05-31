@@ -5,6 +5,7 @@ module is to ensure all storage types have a consistent interface.
 """
 from abc import ABC, abstractmethod
 
+
 class IStorage(ABC):
     """
     abstract base class that defines a generic interface for movie storage.

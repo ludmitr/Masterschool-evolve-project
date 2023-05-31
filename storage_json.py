@@ -2,6 +2,7 @@ from istorage import IStorage
 import json
 import os
 
+
 class StorageJson(IStorage):
     """
     StorageJson class provides implementation for the IStorage interface.
@@ -92,5 +93,3 @@ class StorageJson(IStorage):
         movies[title]["note"] = note
 
         self._save_data(movies)
-
-
