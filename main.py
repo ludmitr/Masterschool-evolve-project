@@ -1,7 +1,7 @@
+import argparse
 from movie_app import MovieApp
 from storage_json import StorageJson
 from storage_csv import StorageCsv
-import sys
 import os
 
 
@@ -16,12 +16,24 @@ def main():
     file_name = "data"
     file_ext = "json"
 
-    # checking for command line args
-    if len(sys.argv) > 1:
-        temp_name, file_ext = os.path.splitext(sys.argv[1])
+    # Define the argparse parser
+    parser = argparse.ArgumentParser(
+        description='This script runs a MovieApp with a specified'
+                    ' storage type and file name.')
+    parser.add_argument('--file_name', metavar='F', type=str,
+                        help='The file name with extension '
+                             'example filename.json or filename.csv')
+
+    # Parse the command line arguments
+    args = parser.parse_args()
+
+    # If file argument is provided, use it to set file name and extension
+    if args.file_name:
+        temp_name, file_ext = os.path.splitext(args.file_name)
         file_name = temp_name if file_ext in [".csv", ".json"] else file_name
 
-    storage = (StorageCsv if file_ext == "csv" else StorageJson)(file_name)
+    # Creating storage and run the app
+    storage = (StorageCsv if file_ext == ".csv" else StorageJson)(file_name)
     movie_app = MovieApp(storage)
     movie_app.run()
 
