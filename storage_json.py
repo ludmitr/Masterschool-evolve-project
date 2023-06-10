@@ -9,7 +9,7 @@ class StorageJson(IStorage):
     It manages and interacts with a movie database stored in a JSON file.
     This class supports operations such as adding, deleting, updating,
     and loading movie data. It validates the JSON file path during
-    initialization and raises. if file with that name does not exist
+    initialization. if file with that name does not exist
     will create a new one.
     """
     def __init__(self, file_name: str):
